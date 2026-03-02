@@ -1,3 +1,6 @@
 spring:
   application:
     name: notifications
+
+server:
+  port: ${SERVER_PORT:8085}
