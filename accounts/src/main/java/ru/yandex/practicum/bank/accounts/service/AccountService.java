@@ -1,0 +1,58 @@
+package ru.yandex.practicum.bank.accounts.service;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import ru.yandex.practicum.bank.accounts.model.Account;
+import ru.yandex.practicum.bank.accounts.repo.AccountRepository;
+
+import java.time.LocalDate;
+import java.time.Period;
+import java.util.List;
+
+@Service
+public class AccountService {
+
+    private final AccountRepository repo;
+
+    public AccountService(AccountRepository repo) {
+        this.repo = repo;
+    }
+
+    @Transactional
+    public Account getOrCreate(String login) {
+        return repo.findById(login).orElseGet(() -> {
+            Account created = new Account(
+                    login,
+                    login,
+                    LocalDate.now().minusYears(18),
+                    0L
+            );
+            return repo.save(created);
+        });
+    }
+
+    @Transactional
+    public Account updateProfile(String login, String name, LocalDate birthdate) {
+        validateAdult(birthdate);
+
+        Account account = getOrCreate(login);
+        account.setName(name);
+        account.setBirthdate(birthdate);
+        return repo.save(account);
+    }
+
+    @Transactional(readOnly = true)
+    public List<Account> recipients(String login) {
+        return repo.findAllRecipients(login);
+    }
+
+    private static void validateAdult(LocalDate birthdate) {
+        if (birthdate == null) {
+            throw new IllegalArgumentException("Дата рождения обязательна");
+        }
+        int years = Period.between(birthdate, LocalDate.now()).getYears();
+        if (years < 18) {
+            throw new IllegalArgumentException("Возраст должен быть больше 18 лет");
+        }
+    }
+}
