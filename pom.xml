@@ -21,13 +21,11 @@
 
     <modules>
         <module>front-ui</module>
-        <!--
         <module>gateway</module>
         <module>accounts</module>
         <module>cash</module>
         <module>transfer</module>
         <module>notifications</module>
-        -->
     </modules>
 
     <properties>
