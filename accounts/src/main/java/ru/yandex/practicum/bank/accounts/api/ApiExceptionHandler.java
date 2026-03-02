@@ -4,6 +4,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.bank.accounts.api.dto.ApiErrorResponse;
+import ru.yandex.practicum.bank.accounts.service.NotEnoughFundsException;
 
 import java.util.List;
 
@@ -23,5 +24,11 @@ public class ApiExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ApiErrorResponse handleBusiness(IllegalArgumentException e) {
         return new ApiErrorResponse(List.of(e.getMessage()), "Bad request");
+    }
+
+    @ExceptionHandler(NotEnoughFundsException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ApiErrorResponse handleNotEnough(NotEnoughFundsException e) {
+        return new ApiErrorResponse(List.of(e.getMessage()), "Conflict");
     }
 }

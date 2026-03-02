@@ -55,4 +55,28 @@ public class AccountService {
             throw new IllegalArgumentException("Возраст должен быть больше 18 лет");
         }
     }
+
+    @Transactional
+    public void deposit(String login, long amount) {
+        if (amount <= 0) {
+            throw new IllegalArgumentException("Сумма должна быть больше 0");
+        }
+        getOrCreate(login);
+        int updated = repo.deposit(login, amount);
+        if (updated != 1) {
+            throw new IllegalStateException("Не удалось пополнить баланс");
+        }
+    }
+
+    @Transactional
+    public void withdraw(String login, long amount) {
+        if (amount <= 0) {
+            throw new IllegalArgumentException("Сумма должна быть больше 0");
+        }
+        getOrCreate(login);
+        int updated = repo.withdrawIfEnough(login, amount);
+        if (updated != 1) {
+            throw new NotEnoughFundsException("Недостаточно средств на счету");
+        }
+    }
 }

@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.web.SecurityFilterChain;
 
@@ -18,9 +19,10 @@ public class SecurityConfig {
     @ConditionalOnProperty(name = "bank.security.enabled", havingValue = "true")
     SecurityFilterChain oauthChain(HttpSecurity http) throws Exception {
         return http
-                .csrf(csrf -> csrf.disable())
+                .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/actuator/health", "/actuator/info").permitAll()
+                        .requestMatchers("/internal/**").hasRole("CALL_ACCOUNTS")
                         .requestMatchers("/api/**").hasRole("ACCOUNTS_ACCESS")
                         .anyRequest().authenticated()
                 )
@@ -35,7 +37,7 @@ public class SecurityConfig {
     @ConditionalOnProperty(name = "bank.security.enabled", havingValue = "false", matchIfMissing = true)
     SecurityFilterChain openChain(HttpSecurity http) throws Exception {
         return http
-                .csrf(csrf -> csrf.disable())
+                .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth.anyRequest().permitAll())
                 .build();
     }
