@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.bank.accounts.api.dto.*;
 import ru.yandex.practicum.bank.accounts.model.Account;
 import ru.yandex.practicum.bank.accounts.service.AccountService;
+import org.springframework.security.core.Authentication;
 
 import java.util.List;
 
@@ -20,31 +21,36 @@ public class AccountsController {
     }
 
     @GetMapping("/me")
-    public AccountMeResponse me(JwtAuthenticationToken auth) {
+    public AccountMeResponse me(Authentication auth) {
         String login = extractLogin(auth);
         Account account = service.getOrCreate(login);
         return new AccountMeResponse(account.getName(), account.getBirthdate(), account.getBalance());
     }
 
     @PatchMapping("/me")
-    public void editMe(@Valid @RequestBody EditAccountRequest req, JwtAuthenticationToken auth) {
+    public void editMe(@Valid @RequestBody EditAccountRequest req, Authentication auth) {
         String login = extractLogin(auth);
         service.updateProfile(login, req.name(), req.birthdate());
     }
 
     @GetMapping("/recipients")
-    public List<RecipientDto> recipients(JwtAuthenticationToken auth) {
+    public List<RecipientDto> recipients(Authentication auth) {
         String login = extractLogin(auth);
         return service.recipients(login).stream()
                 .map(a -> new RecipientDto(a.getLogin(), a.getName()))
                 .toList();
     }
 
-    private static String extractLogin(JwtAuthenticationToken auth) {
+    private static String extractLogin(Authentication auth) {
         if (auth == null) {
-            return "testuser";
+            throw new IllegalStateException("Unauthenticated");
         }
-        String preferred = auth.getToken().getClaimAsString("preferred_username");
-        return preferred != null ? preferred : auth.getName();
+        if (auth instanceof JwtAuthenticationToken jwt) {
+            String preferred = jwt.getToken().getClaimAsString("preferred_username");
+            if (preferred != null && !preferred.isBlank()) {
+                return preferred;
+            }
+        }
+        return auth.getName();
     }
 }

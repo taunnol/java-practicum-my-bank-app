@@ -1,67 +1,38 @@
 package ru.yandex.practicum.bank.accounts.contract;
 
-import io.restassured.RestAssured;
+import io.restassured.module.mockmvc.RestAssuredMockMvc;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
-import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.junit.jupiter.Testcontainers;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.security.test.context.support.WithMockUser;
 
 import java.sql.Date;
+import java.time.LocalDate;
 
-@SpringBootTest(
-        webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
-        properties = {
-                "bank.security.enabled=false"
-        }
-)
-@Testcontainers
+@SpringBootTest(properties = {
+        "bank.security.enabled=false"
+})
+@AutoConfigureMockMvc
+@WithMockUser(username = "testuser")
 public abstract class BaseContractTest {
 
-    static final PostgreSQLContainer<?> POSTGRES =
-            new PostgreSQLContainer<>("postgres:16-alpine")
-                    .withDatabaseName("testdb")
-                    .withUsername("test")
-                    .withPassword("test");
-
-    static {
-        POSTGRES.start();
-    }
-
-    @DynamicPropertySource
-    static void overrideProps(DynamicPropertyRegistry registry) {
-        registry.add("spring.datasource.url", POSTGRES::getJdbcUrl);
-        registry.add("spring.datasource.username", POSTGRES::getUsername);
-        registry.add("spring.datasource.password", POSTGRES::getPassword);
-        registry.add("spring.flyway.enabled", () -> true);
-        registry.add("spring.flyway.locations", () -> "classpath:db/migration");
-    }
-
-    @LocalServerPort
-    int port;
+    @Autowired
+    MockMvc mockMvc;
 
     @Autowired
     JdbcTemplate jdbc;
 
     @BeforeEach
     void setup() {
-        RestAssured.baseURI = "http://localhost";
-        RestAssured.port = port;
+        RestAssuredMockMvc.mockMvc(mockMvc);
 
-        jdbc.execute("TRUNCATE TABLE accounts");
-
-        jdbc.update(
-                "INSERT INTO accounts(login, name, birthdate, balance) VALUES (?,?,?,?)",
-                "testuser", "Test User", Date.valueOf("1990-01-01"), 0L
-        );
-
-        jdbc.update(
-                "INSERT INTO accounts(login, name, birthdate, balance) VALUES (?,?,?,?)",
-                "petrov", "Петров Пётр", Date.valueOf("1991-02-02"), 1000L
-        );
+        jdbc.execute("DELETE FROM accounts");
+        jdbc.update("INSERT INTO accounts (login, name, birthdate, balance) VALUES (?, ?, ?, ?)",
+                "testuser", "testuser", Date.valueOf(LocalDate.of(1990, 1, 1)), 0L);
+        jdbc.update("INSERT INTO accounts (login, name, birthdate, balance) VALUES (?, ?, ?, ?)",
+                "oleg", "Олег", Date.valueOf(LocalDate.of(1985, 5, 10)), 1000L);
     }
 }
