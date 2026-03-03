@@ -10,7 +10,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import ru.yandex.practicum.bank.transfer.client.AccountsClient;
 import ru.yandex.practicum.bank.transfer.client.NotificationsClient;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;

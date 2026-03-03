@@ -34,5 +34,6 @@ public class OAuthAccountsClient implements AccountsClient {
                 .block();
     }
 
-    private record AmountDto(long amount) {}
+    private record AmountDto(long amount) {
+    }
 }

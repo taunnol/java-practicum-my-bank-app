@@ -8,4 +8,5 @@ public record NotificationEvent(
         String actorLogin,
         String targetLogin,
         OffsetDateTime occurredAt
-) { }
+) {
+}

@@ -1,12 +1,14 @@
 package ru.yandex.practicum.bank.accounts.api;
 
 import jakarta.validation.Valid;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.bank.accounts.api.dto.*;
+import ru.yandex.practicum.bank.accounts.api.dto.AccountMeResponse;
+import ru.yandex.practicum.bank.accounts.api.dto.EditAccountRequest;
+import ru.yandex.practicum.bank.accounts.api.dto.RecipientDto;
 import ru.yandex.practicum.bank.accounts.model.Account;
 import ru.yandex.practicum.bank.accounts.service.AccountService;
-import org.springframework.security.core.Authentication;
 
 import java.util.List;
 
@@ -18,6 +20,19 @@ public class AccountsController {
 
     public AccountsController(AccountService service) {
         this.service = service;
+    }
+
+    private static String extractLogin(Authentication auth) {
+        if (auth == null) {
+            throw new IllegalStateException("Unauthenticated");
+        }
+        if (auth instanceof JwtAuthenticationToken jwt) {
+            String preferred = jwt.getToken().getClaimAsString("preferred_username");
+            if (preferred != null && !preferred.isBlank()) {
+                return preferred;
+            }
+        }
+        return auth.getName();
     }
 
     @GetMapping("/me")
@@ -39,18 +54,5 @@ public class AccountsController {
         return service.recipients(login).stream()
                 .map(a -> new RecipientDto(a.getLogin(), a.getName()))
                 .toList();
-    }
-
-    private static String extractLogin(Authentication auth) {
-        if (auth == null) {
-            throw new IllegalStateException("Unauthenticated");
-        }
-        if (auth instanceof JwtAuthenticationToken jwt) {
-            String preferred = jwt.getToken().getClaimAsString("preferred_username");
-            if (preferred != null && !preferred.isBlank()) {
-                return preferred;
-            }
-        }
-        return auth.getName();
     }
 }

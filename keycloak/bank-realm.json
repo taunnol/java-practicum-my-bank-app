@@ -4,11 +4,26 @@
   "sslRequired": "none",
   "roles": {
     "realm": [
-      { "name": "ACCOUNTS_ACCESS", "description": "Доступ к Accounts API" },
-      { "name": "CASH_ACCESS", "description": "Доступ к Cash API" },
-      { "name": "TRANSFER_ACCESS", "description": "Доступ к Transfer API" },
-      { "name": "CALL_ACCOUNTS", "description": "Межсервисный доступ к Accounts internal API" },
-      { "name": "CALL_NOTIFICATIONS", "description": "Межсервисный доступ к Notifications API" }
+      {
+        "name": "ACCOUNTS_ACCESS",
+        "description": "Доступ к Accounts API"
+      },
+      {
+        "name": "CASH_ACCESS",
+        "description": "Доступ к Cash API"
+      },
+      {
+        "name": "TRANSFER_ACCESS",
+        "description": "Доступ к Transfer API"
+      },
+      {
+        "name": "CALL_ACCOUNTS",
+        "description": "Межсервисный доступ к Accounts internal API"
+      },
+      {
+        "name": "CALL_NOTIFICATIONS",
+        "description": "Межсервисный доступ к Notifications API"
+      }
     ]
   },
   "users": [
@@ -19,9 +34,17 @@
       "lastName": "Тестовый",
       "email": "testuser@bank.local",
       "credentials": [
-        { "type": "password", "value": "password", "temporary": false }
+        {
+          "type": "password",
+          "value": "password",
+          "temporary": false
+        }
       ],
-      "realmRoles": ["ACCOUNTS_ACCESS", "CASH_ACCESS", "TRANSFER_ACCESS"]
+      "realmRoles": [
+        "ACCOUNTS_ACCESS",
+        "CASH_ACCESS",
+        "TRANSFER_ACCESS"
+      ]
     },
     {
       "username": "petrov",
@@ -30,9 +53,17 @@
       "lastName": "Петров",
       "email": "petrov@bank.local",
       "credentials": [
-        { "type": "password", "value": "password", "temporary": false }
+        {
+          "type": "password",
+          "value": "password",
+          "temporary": false
+        }
       ],
-      "realmRoles": ["ACCOUNTS_ACCESS", "CASH_ACCESS", "TRANSFER_ACCESS"]
+      "realmRoles": [
+        "ACCOUNTS_ACCESS",
+        "CASH_ACCESS",
+        "TRANSFER_ACCESS"
+      ]
     },
     {
       "username": "ivanov",
@@ -41,9 +72,17 @@
       "lastName": "Иванов",
       "email": "ivanov@bank.local",
       "credentials": [
-        { "type": "password", "value": "password", "temporary": false }
+        {
+          "type": "password",
+          "value": "password",
+          "temporary": false
+        }
       ],
-      "realmRoles": ["ACCOUNTS_ACCESS", "CASH_ACCESS", "TRANSFER_ACCESS"]
+      "realmRoles": [
+        "ACCOUNTS_ACCESS",
+        "CASH_ACCESS",
+        "TRANSFER_ACCESS"
+      ]
     },
     {
       "username": "olegov",
@@ -52,9 +91,17 @@
       "lastName": "Олегов",
       "email": "olegov@bank.local",
       "credentials": [
-        { "type": "password", "value": "password", "temporary": false }
+        {
+          "type": "password",
+          "value": "password",
+          "temporary": false
+        }
       ],
-      "realmRoles": ["ACCOUNTS_ACCESS", "CASH_ACCESS", "TRANSFER_ACCESS"]
+      "realmRoles": [
+        "ACCOUNTS_ACCESS",
+        "CASH_ACCESS",
+        "TRANSFER_ACCESS"
+      ]
     }
   ],
   "clients": [
@@ -64,10 +111,18 @@
       "publicClient": true,
       "directAccessGrantsEnabled": true,
       "standardFlowEnabled": true,
-      "redirectUris": ["http://localhost:8080/*"],
-      "webOrigins": ["http://localhost:8080"],
+      "redirectUris": [
+        "http://localhost:8080/*"
+      ],
+      "webOrigins": [
+        "http://localhost:8080"
+      ],
       "protocol": "openid-connect",
-      "defaultClientScopes": ["openid", "profile", "email"]
+      "defaultClientScopes": [
+        "openid",
+        "profile",
+        "email"
+      ]
     },
     {
       "clientId": "cash-service",
@@ -78,7 +133,9 @@
       "directAccessGrantsEnabled": false,
       "secret": "cash-service-secret",
       "protocol": "openid-connect",
-      "defaultClientScopes": ["openid"]
+      "defaultClientScopes": [
+        "openid"
+      ]
     },
     {
       "clientId": "transfer-service",
@@ -89,7 +146,9 @@
       "directAccessGrantsEnabled": false,
       "secret": "transfer-service-secret",
       "protocol": "openid-connect",
-      "defaultClientScopes": ["openid"]
+      "defaultClientScopes": [
+        "openid"
+      ]
     },
     {
       "clientId": "accounts-service",
@@ -100,7 +159,9 @@
       "directAccessGrantsEnabled": false,
       "secret": "accounts-service-secret",
       "protocol": "openid-connect",
-      "defaultClientScopes": ["openid"]
+      "defaultClientScopes": [
+        "openid"
+      ]
     }
   ],
   "scopeMappings": [
@@ -111,13 +172,30 @@
   ],
   "clientScopeMappings": {
     "cash-service": [
-      { "client": false, "roles": ["CALL_ACCOUNTS", "CALL_NOTIFICATIONS"] }
+      {
+        "client": false,
+        "roles": [
+          "CALL_ACCOUNTS",
+          "CALL_NOTIFICATIONS"
+        ]
+      }
     ],
     "transfer-service": [
-      { "client": false, "roles": ["CALL_ACCOUNTS", "CALL_NOTIFICATIONS"] }
+      {
+        "client": false,
+        "roles": [
+          "CALL_ACCOUNTS",
+          "CALL_NOTIFICATIONS"
+        ]
+      }
     ],
     "accounts-service": [
-      { "client": false, "roles": ["CALL_NOTIFICATIONS"] }
+      {
+        "client": false,
+        "roles": [
+          "CALL_NOTIFICATIONS"
+        ]
+      }
     ]
   }
 }

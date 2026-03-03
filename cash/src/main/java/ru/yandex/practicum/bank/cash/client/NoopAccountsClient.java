@@ -6,10 +6,13 @@ import org.springframework.stereotype.Component;
 @Component
 @ConditionalOnProperty(name = "bank.security.enabled", havingValue = "false")
 public class NoopAccountsClient implements AccountsClient {
-    @Override public void deposit(String login, long amount) {
+    @Override
+    public void deposit(String login, long amount) {
         throw new IllegalStateException("AccountsClient is disabled");
     }
-    @Override public void withdraw(String login, long amount) {
+
+    @Override
+    public void withdraw(String login, long amount) {
         throw new IllegalStateException("AccountsClient is disabled");
     }
 }

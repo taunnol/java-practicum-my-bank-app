@@ -30,18 +30,27 @@ public class CashService {
 
         if (action == CashAction.PUT) {
             circuitBreakerFactory.create("accounts-deposit").run(
-                    () -> { accountsClient.deposit(login, value); return null; });
+                    () -> {
+                        accountsClient.deposit(login, value);
+                        return null;
+                    });
             sendNotification(new NotificationEvent("CASH_IN", value, login, null, OffsetDateTime.now()));
         } else {
             circuitBreakerFactory.create("accounts-withdraw").run(
-                    () -> { accountsClient.withdraw(login, value); return null; });
+                    () -> {
+                        accountsClient.withdraw(login, value);
+                        return null;
+                    });
             sendNotification(new NotificationEvent("CASH_OUT", value, login, null, OffsetDateTime.now()));
         }
     }
 
     private void sendNotification(NotificationEvent event) {
         circuitBreakerFactory.create("notifications").run(
-                () -> { notificationsClient.send(event); return null; },
+                () -> {
+                    notificationsClient.send(event);
+                    return null;
+                },
                 throwable -> null);
     }
 }

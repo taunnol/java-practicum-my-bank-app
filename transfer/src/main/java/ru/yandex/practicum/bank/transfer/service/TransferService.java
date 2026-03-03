@@ -34,11 +34,17 @@ public class TransferService {
         }
 
         circuitBreakerFactory.create("accounts-withdraw").run(
-                () -> { accountsClient.withdraw(fromLogin, amount); return null; });
+                () -> {
+                    accountsClient.withdraw(fromLogin, amount);
+                    return null;
+                });
 
         try {
             circuitBreakerFactory.create("accounts-deposit").run(
-                    () -> { accountsClient.deposit(toLogin, amount); return null; });
+                    () -> {
+                        accountsClient.deposit(toLogin, amount);
+                        return null;
+                    });
         } catch (RuntimeException e) {
             try {
                 accountsClient.deposit(fromLogin, amount);

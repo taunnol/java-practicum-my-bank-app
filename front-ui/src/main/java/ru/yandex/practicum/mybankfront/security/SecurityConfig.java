@@ -21,7 +21,8 @@ public class SecurityConfig {
                         .requestMatchers("/", "/error").permitAll()
                         .anyRequest().authenticated()
                 )
-                .oauth2Login(oauth -> { })
+                .oauth2Login(oauth -> {
+                })
                 .logout(logout -> logout.logoutSuccessUrl("/"))
                 .build();
     }

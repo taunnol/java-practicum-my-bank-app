@@ -28,6 +28,16 @@ public class AccountService {
         this.circuitBreakerFactory = circuitBreakerFactory;
     }
 
+    private static void validateAdult(LocalDate birthdate) {
+        if (birthdate == null) {
+            throw new IllegalArgumentException("Дата рождения обязательна");
+        }
+        int years = Period.between(birthdate, LocalDate.now()).getYears();
+        if (years < 18) {
+            throw new IllegalArgumentException("Возраст должен быть больше 18 лет");
+        }
+    }
+
     @Transactional
     public Account getOrCreate(String login) {
         return repo.findById(login).orElseGet(() -> {
@@ -59,16 +69,6 @@ public class AccountService {
         return repo.findAllRecipients(login);
     }
 
-    private static void validateAdult(LocalDate birthdate) {
-        if (birthdate == null) {
-            throw new IllegalArgumentException("Дата рождения обязательна");
-        }
-        int years = Period.between(birthdate, LocalDate.now()).getYears();
-        if (years < 18) {
-            throw new IllegalArgumentException("Возраст должен быть больше 18 лет");
-        }
-    }
-
     @Transactional
     public void deposit(String login, long amount) {
         if (amount <= 0) {
@@ -95,7 +95,10 @@ public class AccountService {
 
     private void sendNotification(NotificationEvent event) {
         circuitBreakerFactory.create("notifications").run(
-                () -> { notificationsClient.send(event); return null; },
+                () -> {
+                    notificationsClient.send(event);
+                    return null;
+                },
                 throwable -> null);
     }
 }

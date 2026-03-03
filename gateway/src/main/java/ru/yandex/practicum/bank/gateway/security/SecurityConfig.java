@@ -17,6 +17,12 @@ import reactor.core.publisher.Mono;
 @EnableWebFluxSecurity
 public class SecurityConfig {
 
+    private static org.springframework.core.convert.converter.Converter<Jwt, Mono<AbstractAuthenticationToken>> jwtAuthConverter() {
+        JwtAuthenticationConverter delegate = new JwtAuthenticationConverter();
+        delegate.setJwtGrantedAuthoritiesConverter(new KeycloakRealmRoleConverter());
+        return new ReactiveJwtAuthenticationConverterAdapter(delegate);
+    }
+
     @Bean
     @Order(1)
     @ConditionalOnProperty(name = "bank.security.enabled", havingValue = "true", matchIfMissing = true)
@@ -44,11 +50,5 @@ public class SecurityConfig {
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
                 .authorizeExchange(ex -> ex.anyExchange().permitAll())
                 .build();
-    }
-
-    private static org.springframework.core.convert.converter.Converter<Jwt, Mono<AbstractAuthenticationToken>> jwtAuthConverter() {
-        JwtAuthenticationConverter delegate = new JwtAuthenticationConverter();
-        delegate.setJwtGrantedAuthoritiesConverter(new KeycloakRealmRoleConverter());
-        return new ReactiveJwtAuthenticationConverterAdapter(delegate);
     }
 }

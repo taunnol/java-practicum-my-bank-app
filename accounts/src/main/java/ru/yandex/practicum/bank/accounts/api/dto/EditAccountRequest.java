@@ -8,4 +8,5 @@ import java.time.LocalDate;
 public record EditAccountRequest(
         @NotBlank String name,
         @NotNull LocalDate birthdate
-) { }
+) {
+}

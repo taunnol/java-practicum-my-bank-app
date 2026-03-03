@@ -2,7 +2,9 @@ package ru.yandex.practicum.bank.accounts.api;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 import ru.yandex.practicum.bank.accounts.api.dto.ApiErrorResponse;
 import ru.yandex.practicum.bank.accounts.service.NotEnoughFundsException;
 

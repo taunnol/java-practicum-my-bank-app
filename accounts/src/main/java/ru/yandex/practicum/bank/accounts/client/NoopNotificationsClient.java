@@ -7,5 +7,6 @@ import org.springframework.stereotype.Component;
 @ConditionalOnProperty(name = "bank.security.enabled", havingValue = "false")
 public class NoopNotificationsClient implements NotificationsClient {
     @Override
-    public void send(NotificationEvent event) { }
+    public void send(NotificationEvent event) {
+    }
 }

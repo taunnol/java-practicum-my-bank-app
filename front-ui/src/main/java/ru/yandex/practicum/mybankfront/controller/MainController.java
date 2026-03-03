@@ -1,6 +1,7 @@
 package ru.yandex.practicum.mybankfront.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,7 +12,6 @@ import ru.yandex.practicum.mybankfront.client.GatewayApiClient;
 import ru.yandex.practicum.mybankfront.client.dto.*;
 import ru.yandex.practicum.mybankfront.controller.dto.AccountDto;
 import ru.yandex.practicum.mybankfront.controller.dto.CashAction;
-import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;

@@ -3,7 +3,10 @@ package ru.yandex.practicum.bank.transfer.api;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import ru.yandex.practicum.bank.transfer.api.dto.ApiErrorResponse;
 
@@ -48,24 +51,6 @@ public class ApiExceptionHandler {
         return new ApiErrorResponse(e.errors, e.message);
     }
 
-    @ResponseStatus
-    private static class DownstreamException extends RuntimeException {
-        private final HttpStatus status;
-        private final List<String> errors;
-        private final String message;
-
-        DownstreamException(HttpStatus status, List<String> errors, String message) {
-            this.status = status;
-            this.errors = errors;
-            this.message = message;
-        }
-
-        @ResponseStatus
-        public HttpStatus getStatus() {
-            return status;
-        }
-    }
-
     private List<String> tryParseErrors(WebClientResponseException e) {
         String body = e.getResponseBodyAsString();
         if (body == null || body.isBlank()) {
@@ -82,5 +67,23 @@ public class ApiExceptionHandler {
         } catch (Exception ignore) {
         }
         return List.of(body);
+    }
+
+    @ResponseStatus
+    private static class DownstreamException extends RuntimeException {
+        private final HttpStatus status;
+        private final List<String> errors;
+        private final String message;
+
+        DownstreamException(HttpStatus status, List<String> errors, String message) {
+            this.status = status;
+            this.errors = errors;
+            this.message = message;
+        }
+
+        @ResponseStatus
+        public HttpStatus getStatus() {
+            return status;
+        }
     }
 }

@@ -9,5 +9,6 @@ import ru.yandex.practicum.bank.transfer.service.NotificationEvent;
 public class NoopNotificationsClient implements NotificationsClient {
 
     @Override
-    public void send(NotificationEvent event) { }
+    public void send(NotificationEvent event) {
+    }
 }

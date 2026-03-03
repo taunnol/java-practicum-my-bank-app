@@ -25,15 +25,35 @@ public class Account {
         this.balance = balance;
     }
 
-    public String getLogin() { return login; }
-    public void setLogin(String login) { this.login = login; }
+    public String getLogin() {
+        return login;
+    }
 
-    public String getName() { return name; }
-    public void setName(String name) { this.name = name; }
+    public void setLogin(String login) {
+        this.login = login;
+    }
 
-    public LocalDate getBirthdate() { return birthdate; }
-    public void setBirthdate(LocalDate birthdate) { this.birthdate = birthdate; }
+    public String getName() {
+        return name;
+    }
 
-    public long getBalance() { return balance; }
-    public void setBalance(long balance) { this.balance = balance; }
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public LocalDate getBirthdate() {
+        return birthdate;
+    }
+
+    public void setBirthdate(LocalDate birthdate) {
+        this.birthdate = birthdate;
+    }
+
+    public long getBalance() {
+        return balance;
+    }
+
+    public void setBalance(long balance) {
+        this.balance = balance;
+    }
 }

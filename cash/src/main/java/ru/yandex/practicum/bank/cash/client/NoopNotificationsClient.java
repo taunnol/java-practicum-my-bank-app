@@ -7,5 +7,7 @@ import ru.yandex.practicum.bank.cash.service.NotificationEvent;
 @Component
 @ConditionalOnProperty(name = "bank.security.enabled", havingValue = "false")
 public class NoopNotificationsClient implements NotificationsClient {
-    @Override public void send(NotificationEvent event) { }
+    @Override
+    public void send(NotificationEvent event) {
+    }
 }
