@@ -1,4 +1,4 @@
-package ru.yandex.practicum.bank.accounts.security;
+package ru.yandex.practicum.bank.common.security;
 
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.security.core.GrantedAuthority;

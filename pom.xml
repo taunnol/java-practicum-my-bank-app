@@ -20,6 +20,7 @@
     <description>My Bank Application</description>
 
     <modules>
+        <module>common</module>
         <module>front-ui</module>
         <module>gateway</module>
         <module>accounts</module>
