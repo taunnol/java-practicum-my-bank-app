@@ -69,6 +69,11 @@
                     <artifactId>maven-surefire-plugin</artifactId>
                     <configuration>
                         <useModulePath>false</useModulePath>
+                        <systemPropertyVariables>
+                            <spring.cloud.consul.enabled>false</spring.cloud.consul.enabled>
+                            <spring.cloud.consul.config.enabled>false</spring.cloud.consul.config.enabled>
+                            <spring.cloud.consul.discovery.enabled>false</spring.cloud.consul.discovery.enabled>
+                        </systemPropertyVariables>
                     </configuration>
                 </plugin>
 
@@ -83,19 +88,6 @@
                 <plugin>
                     <groupId>org.springframework.boot</groupId>
                     <artifactId>spring-boot-maven-plugin</artifactId>
-                </plugin>
-
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-surefire-plugin</artifactId>
-                    <configuration>
-                        <useModulePath>false</useModulePath>
-                        <systemPropertyVariables>
-                            <spring.cloud.consul.enabled>false</spring.cloud.consul.enabled>
-                            <spring.cloud.consul.config.enabled>false</spring.cloud.consul.config.enabled>
-                            <spring.cloud.consul.discovery.enabled>false</spring.cloud.consul.discovery.enabled>
-                        </systemPropertyVariables>
-                    </configuration>
                 </plugin>
             </plugins>
         </pluginManagement>
