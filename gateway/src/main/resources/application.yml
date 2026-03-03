@@ -22,6 +22,14 @@ spring:
         health-check-path: /actuator/health
         health-check-interval: 10s
 
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+      default-filters:
+        - TokenRelay
+
 server:
   port: ${SERVER_PORT:8081}
 
