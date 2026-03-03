@@ -1,11 +1,15 @@
 package ru.yandex.practicum.bank.accounts.service;
 
+import org.springframework.cloud.client.circuitbreaker.CircuitBreakerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.yandex.practicum.bank.accounts.client.NotificationEvent;
+import ru.yandex.practicum.bank.accounts.client.NotificationsClient;
 import ru.yandex.practicum.bank.accounts.model.Account;
 import ru.yandex.practicum.bank.accounts.repo.AccountRepository;
 
 import java.time.LocalDate;
+import java.time.OffsetDateTime;
 import java.time.Period;
 import java.util.List;
 
@@ -13,9 +17,15 @@ import java.util.List;
 public class AccountService {
 
     private final AccountRepository repo;
+    private final NotificationsClient notificationsClient;
+    private final CircuitBreakerFactory<?, ?> circuitBreakerFactory;
 
-    public AccountService(AccountRepository repo) {
+    public AccountService(AccountRepository repo,
+                          NotificationsClient notificationsClient,
+                          CircuitBreakerFactory<?, ?> circuitBreakerFactory) {
         this.repo = repo;
+        this.notificationsClient = notificationsClient;
+        this.circuitBreakerFactory = circuitBreakerFactory;
     }
 
     @Transactional
@@ -38,7 +48,10 @@ public class AccountService {
         Account account = getOrCreate(login);
         account.setName(name);
         account.setBirthdate(birthdate);
-        return repo.save(account);
+        Account saved = repo.save(account);
+        sendNotification(new NotificationEvent(
+                "PROFILE_UPDATE", 0, login, null, OffsetDateTime.now()));
+        return saved;
     }
 
     @Transactional(readOnly = true)
@@ -78,5 +91,11 @@ public class AccountService {
         if (updated != 1) {
             throw new NotEnoughFundsException("Недостаточно средств на счету");
         }
+    }
+
+    private void sendNotification(NotificationEvent event) {
+        circuitBreakerFactory.create("notifications").run(
+                () -> { notificationsClient.send(event); return null; },
+                throwable -> null);
     }
 }
