@@ -2,9 +2,9 @@ package ru.yandex.practicum.bank.transfer.api;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
@@ -37,18 +37,15 @@ public class ApiExceptionHandler {
     }
 
     @ExceptionHandler(WebClientResponseException.class)
-    public @ResponseBody ApiErrorResponse handleDownstream(WebClientResponseException e) {
-        // если accounts вернул 409 (недостаточно средств) — пробрасываем 409 и errors[]
+    public ResponseEntity<ApiErrorResponse> handleDownstream(WebClientResponseException e) {
         if (e.getStatusCode().value() == 409) {
-            throw new DownstreamException(HttpStatus.CONFLICT, tryParseErrors(e), "Conflict");
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body(new ApiErrorResponse(tryParseErrors(e), "Conflict"));
         }
-        throw new DownstreamException(HttpStatus.BAD_GATEWAY, List.of("Ошибка при обращении к сервису: " + e.getStatusCode()), "Downstream error");
-    }
-
-    @ExceptionHandler(DownstreamException.class)
-    @ResponseStatus
-    public ApiErrorResponse handleDownstream2(DownstreamException e) {
-        return new ApiErrorResponse(e.errors, e.message);
+        return ResponseEntity.status(HttpStatus.BAD_GATEWAY)
+                .body(new ApiErrorResponse(
+                        List.of("Ошибка при обращении к сервису: " + e.getStatusCode()),
+                        "Downstream error"));
     }
 
     private List<String> tryParseErrors(WebClientResponseException e) {
@@ -69,21 +66,4 @@ public class ApiExceptionHandler {
         return List.of(body);
     }
 
-    @ResponseStatus
-    private static class DownstreamException extends RuntimeException {
-        private final HttpStatus status;
-        private final List<String> errors;
-        private final String message;
-
-        DownstreamException(HttpStatus status, List<String> errors, String message) {
-            this.status = status;
-            this.errors = errors;
-            this.message = message;
-        }
-
-        @ResponseStatus
-        public HttpStatus getStatus() {
-            return status;
-        }
-    }
 }
