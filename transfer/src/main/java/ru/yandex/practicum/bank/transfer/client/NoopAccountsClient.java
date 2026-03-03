@@ -4,7 +4,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 @Component
-@ConditionalOnProperty(name = "bank.security.enabled", havingValue = "false", matchIfMissing = true)
+@ConditionalOnProperty(name = "bank.security.enabled", havingValue = "false")
 public class NoopAccountsClient implements AccountsClient {
 
     @Override

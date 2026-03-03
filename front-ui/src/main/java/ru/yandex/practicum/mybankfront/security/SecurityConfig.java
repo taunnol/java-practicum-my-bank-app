@@ -12,7 +12,7 @@ public class SecurityConfig {
 
     @Bean
     @Order(1)
-    @ConditionalOnProperty(name = "bank.security.enabled", havingValue = "true")
+    @ConditionalOnProperty(name = "bank.security.enabled", havingValue = "true", matchIfMissing = true)
     SecurityFilterChain oauthChain(HttpSecurity http) throws Exception {
         return http
                 .csrf(csrf -> csrf.disable())
@@ -28,7 +28,7 @@ public class SecurityConfig {
 
     @Bean
     @Order(2)
-    @ConditionalOnProperty(name = "bank.security.enabled", havingValue = "false", matchIfMissing = true)
+    @ConditionalOnProperty(name = "bank.security.enabled", havingValue = "false")
     SecurityFilterChain openChain(HttpSecurity http) throws Exception {
         return http
                 .csrf(csrf -> csrf.disable())

@@ -14,7 +14,7 @@ import org.springframework.security.oauth2.client.web.reactive.function.client.S
 import org.springframework.web.reactive.function.client.WebClient;
 
 @Configuration
-@ConditionalOnProperty(name = "bank.security.enabled", havingValue = "true")
+@ConditionalOnProperty(name = "bank.security.enabled", havingValue = "true", matchIfMissing = true)
 public class OAuth2WebClientConfig {
 
     @Bean
