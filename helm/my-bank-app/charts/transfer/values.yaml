@@ -13,7 +13,7 @@ security:
   enabled: true
   oauth2:
     clientId: transfer-service
-    clientSecret: ""
+    clientSecret: transfer-service-secret
 
 resources:
   requests:

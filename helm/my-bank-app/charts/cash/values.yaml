@@ -13,7 +13,7 @@ security:
   enabled: true
   oauth2:
     clientId: cash-service
-    clientSecret: ""
+    clientSecret: cash-service-secret
 
 resources:
   requests:

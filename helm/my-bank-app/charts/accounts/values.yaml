@@ -20,7 +20,7 @@ security:
   enabled: true
   oauth2:
     clientId: accounts-service
-    clientSecret: ""
+    clientSecret: accounts-service-secret
 
 resources:
   requests:
