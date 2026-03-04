@@ -57,6 +57,24 @@ data:
           "email": "olegov@bank.local",
           "credentials": [{ "type": "password", "value": "password", "temporary": false }],
           "realmRoles": ["ACCOUNTS_ACCESS", "CASH_ACCESS", "TRANSFER_ACCESS"]
+        },
+        {
+          "username": "service-account-cash-service",
+          "enabled": true,
+          "serviceAccountClientId": "cash-service",
+          "realmRoles": ["CALL_ACCOUNTS", "CALL_NOTIFICATIONS"]
+        },
+        {
+          "username": "service-account-transfer-service",
+          "enabled": true,
+          "serviceAccountClientId": "transfer-service",
+          "realmRoles": ["CALL_ACCOUNTS", "CALL_NOTIFICATIONS"]
+        },
+        {
+          "username": "service-account-accounts-service",
+          "enabled": true,
+          "serviceAccountClientId": "accounts-service",
+          "realmRoles": ["CALL_NOTIFICATIONS"]
         }
       ],
       "clients": [
@@ -68,8 +86,7 @@ data:
           "standardFlowEnabled": true,
           "redirectUris": ["*"],
           "webOrigins": ["*"],
-          "protocol": "openid-connect",
-          "defaultClientScopes": ["openid", "profile", "email"]
+          "protocol": "openid-connect"
         },
         {
           "clientId": "cash-service",
@@ -79,8 +96,7 @@ data:
           "standardFlowEnabled": false,
           "directAccessGrantsEnabled": false,
           "secret": "cash-service-secret",
-          "protocol": "openid-connect",
-          "defaultClientScopes": ["openid"]
+          "protocol": "openid-connect"
         },
         {
           "clientId": "transfer-service",
@@ -90,8 +106,7 @@ data:
           "standardFlowEnabled": false,
           "directAccessGrantsEnabled": false,
           "secret": "transfer-service-secret",
-          "protocol": "openid-connect",
-          "defaultClientScopes": ["openid"]
+          "protocol": "openid-connect"
         },
         {
           "clientId": "accounts-service",
@@ -101,16 +116,7 @@ data:
           "standardFlowEnabled": false,
           "directAccessGrantsEnabled": false,
           "secret": "accounts-service-secret",
-          "protocol": "openid-connect",
-          "defaultClientScopes": ["openid"]
+          "protocol": "openid-connect"
         }
-      ],
-      "scopeMappings": [
-        { "clientScope": "openid", "roles": [] }
-      ],
-      "clientScopeMappings": {
-        "cash-service": [{ "client": false, "roles": ["CALL_ACCOUNTS", "CALL_NOTIFICATIONS"] }],
-        "transfer-service": [{ "client": false, "roles": ["CALL_ACCOUNTS", "CALL_NOTIFICATIONS"] }],
-        "accounts-service": [{ "client": false, "roles": ["CALL_NOTIFICATIONS"] }]
-      }
+      ]
     }

@@ -62,9 +62,7 @@ spec:
             - name: KC_HEALTH_ENABLED
               value: "true"
             - name: KC_HOSTNAME
-              value: localhost
-            - name: KC_HOSTNAME_PORT
-              value: {{ .Values.service.nodePort | quote }}
+              value: "http://localhost:{{ .Values.service.nodePort }}"
             - name: KC_HOSTNAME_STRICT
               value: "false"
           volumeMounts:
@@ -73,15 +71,15 @@ spec:
           readinessProbe:
             httpGet:
               path: /health/ready
-              port: {{ .Values.service.port }}
-            initialDelaySeconds: 30
+              port: 9000
+            initialDelaySeconds: 60
             periodSeconds: 10
             timeoutSeconds: 5
           livenessProbe:
             httpGet:
               path: /health/live
-              port: {{ .Values.service.port }}
-            initialDelaySeconds: 60
+              port: 9000
+            initialDelaySeconds: 90
             periodSeconds: 15
             timeoutSeconds: 5
           resources:
