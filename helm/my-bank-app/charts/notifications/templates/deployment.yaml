@@ -23,24 +23,34 @@ spec:
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
-            - containerPort: {{ .Values.service.port }}
+            - containerPort: {{ .Values.service.containerPort }}
               name: http
           envFrom:
             - configMapRef:
                 name: {{ .Release.Name }}-notifications-config
+          volumeMounts:
+            - name: app-config
+              mountPath: /app/config
           readinessProbe:
             httpGet:
               path: /actuator/health
-              port: {{ .Values.service.port }}
+              port: {{ .Values.service.containerPort }}
             initialDelaySeconds: 30
             periodSeconds: 10
             timeoutSeconds: 5
           livenessProbe:
             httpGet:
               path: /actuator/health
-              port: {{ .Values.service.port }}
+              port: {{ .Values.service.containerPort }}
             initialDelaySeconds: 60
             periodSeconds: 15
             timeoutSeconds: 5
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
+      volumes:
+        - name: app-config
+          configMap:
+            name: {{ .Release.Name }}-notifications-config
+            items:
+              - key: application.yml
+                path: application.yml

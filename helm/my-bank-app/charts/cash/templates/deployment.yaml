@@ -28,8 +28,9 @@ spec:
           envFrom:
             - configMapRef:
                 name: {{ .Release.Name }}-cash-config
-            - secretRef:
-                name: {{ .Release.Name }}-cash-secret
+          volumeMounts:
+            - name: app-config
+              mountPath: /app/config
           readinessProbe:
             httpGet:
               path: /actuator/health
@@ -46,3 +47,10 @@ spec:
             timeoutSeconds: 5
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
+      volumes:
+        - name: app-config
+          configMap:
+            name: {{ .Release.Name }}-cash-config
+            items:
+              - key: application.yml
+                path: application.yml
