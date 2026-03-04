@@ -7,13 +7,32 @@ metadata:
     chart: {{ .Chart.Name }}-{{ .Chart.Version }}
     release: {{ .Release.Name }}
 data:
-  SERVER_PORT: {{ .Values.service.port | quote }}
-  SPRING_DATASOURCE_URL: "jdbc:postgresql://{{ .Values.database.host }}:{{ .Values.database.port }}/{{ .Values.database.name }}"
-  SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: {{ .Values.global.keycloak.issuerUri | quote }}
-  SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: {{ .Values.global.keycloak.jwkSetUri | quote }}
-  SPRING_SECURITY_OAUTH2_CLIENT_PROVIDER_KEYCLOAK_TOKEN_URI: {{ .Values.global.keycloak.tokenUri | quote }}
-  SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_ACCOUNTS_SERVICE_PROVIDER: keycloak
-  SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_ACCOUNTS_SERVICE_AUTHORIZATION_GRANT_TYPE: client_credentials
-  SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_ACCOUNTS_SERVICE_CLIENT_ID: {{ .Values.security.oauth2.clientId | quote }}
-  SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_ACCOUNTS_SERVICE_SCOPE: openid
+  SERVER_PORT: {{ .Values.service.containerPort | quote }}
   BANK_SECURITY_ENABLED: {{ .Values.security.enabled | quote }}
+  SPRING_CONFIG_ADDITIONAL_LOCATION: /app/config/
+  application.yml: |
+    spring:
+      datasource:
+        url: jdbc:postgresql://{{ .Values.database.host }}:{{ .Values.database.port }}/{{ .Values.database.name }}
+      security:
+        oauth2:
+          resourceserver:
+            jwt:
+              issuer-uri: {{ .Values.global.keycloak.issuerUri }}
+              jwk-set-uri: {{ .Values.global.keycloak.jwkSetUri }}
+          client:
+            registration:
+              accounts-service:
+                provider: keycloak
+                authorization-grant-type: client_credentials
+                client-id: {{ .Values.security.oauth2.clientId }}
+                client-secret: {{ .Values.security.oauth2.clientSecret }}
+                scope: openid
+            provider:
+              keycloak:
+                token-uri: {{ .Values.global.keycloak.tokenUri }}
+    resilience4j:
+      timelimiter:
+        configs:
+          default:
+            timeout-duration: 10s

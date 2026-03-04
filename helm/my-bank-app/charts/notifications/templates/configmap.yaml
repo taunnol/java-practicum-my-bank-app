@@ -7,7 +7,14 @@ metadata:
     chart: {{ .Chart.Name }}-{{ .Chart.Version }}
     release: {{ .Release.Name }}
 data:
-  SERVER_PORT: {{ .Values.service.port | quote }}
-  SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: {{ .Values.global.keycloak.issuerUri | quote }}
-  SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: {{ .Values.global.keycloak.jwkSetUri | quote }}
+  SERVER_PORT: {{ .Values.service.containerPort | quote }}
   BANK_SECURITY_ENABLED: {{ .Values.security.enabled | quote }}
+  SPRING_CONFIG_ADDITIONAL_LOCATION: /app/config/
+  application.yml: |
+    spring:
+      security:
+        oauth2:
+          resourceserver:
+            jwt:
+              issuer-uri: {{ .Values.global.keycloak.issuerUri }}
+              jwk-set-uri: {{ .Values.global.keycloak.jwkSetUri }}
