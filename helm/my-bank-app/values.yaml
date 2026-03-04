@@ -10,8 +10,10 @@ global:
     host: keycloak
     httpPort: 8080
     realmName: bank
-    issuerUri: http://keycloak:8080/realms/bank
     externalPort: 30088
+    issuerUri: http://localhost:30088/realms/bank
+    jwkSetUri: http://keycloak:8080/realms/bank/protocol/openid-connect/certs
+    tokenUri: http://keycloak:8080/realms/bank/protocol/openid-connect/token
 
   services:
     accounts:

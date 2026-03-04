@@ -61,6 +61,12 @@ spec:
               value: {{ .Values.service.port | quote }}
             - name: KC_HEALTH_ENABLED
               value: "true"
+            - name: KC_HOSTNAME
+              value: localhost
+            - name: KC_HOSTNAME_PORT
+              value: {{ .Values.service.nodePort | quote }}
+            - name: KC_HOSTNAME_STRICT
+              value: "false"
           volumeMounts:
             - name: realm-config
               mountPath: /opt/keycloak/data/import

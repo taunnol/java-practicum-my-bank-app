@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-gateway-config
+  labels:
+    app: gateway
+    chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+    release: {{ .Release.Name }}
+data:
+  SERVER_PORT: {{ .Values.service.port | quote }}
+  BANK_SECURITY_ENABLED: {{ .Values.security.enabled | quote }}
+  SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: {{ .Values.global.keycloak.issuerUri | quote }}
+  SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: {{ .Values.global.keycloak.jwkSetUri | quote }}
+  SPRING_CLOUD_GATEWAY_ROUTES_0_ID: accounts
+  SPRING_CLOUD_GATEWAY_ROUTES_0_URI: "http://{{ .Values.global.services.accounts.host }}:{{ .Values.global.services.accounts.port }}"
+  SPRING_CLOUD_GATEWAY_ROUTES_0_PREDICATES_0: "Path=/api/accounts/**"
+  SPRING_CLOUD_GATEWAY_ROUTES_1_ID: cash
+  SPRING_CLOUD_GATEWAY_ROUTES_1_URI: "http://{{ .Values.global.services.cash.host }}:{{ .Values.global.services.cash.port }}"
+  SPRING_CLOUD_GATEWAY_ROUTES_1_PREDICATES_0: "Path=/api/cash/**"
+  SPRING_CLOUD_GATEWAY_ROUTES_2_ID: transfer
+  SPRING_CLOUD_GATEWAY_ROUTES_2_URI: "http://{{ .Values.global.services.transfer.host }}:{{ .Values.global.services.transfer.port }}"
+  SPRING_CLOUD_GATEWAY_ROUTES_2_PREDICATES_0: "Path=/api/transfers/**"
+  SPRING_CLOUD_GATEWAY_ROUTES_3_ID: notifications
+  SPRING_CLOUD_GATEWAY_ROUTES_3_URI: "http://{{ .Values.global.services.notifications.host }}:{{ .Values.global.services.notifications.port }}"
+  SPRING_CLOUD_GATEWAY_ROUTES_3_PREDICATES_0: "Path=/api/notifications/**"
+  SPRING_CLOUD_GATEWAY_DEFAULT_FILTERS_0: TokenRelay

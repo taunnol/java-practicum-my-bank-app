@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-front-ui-config
+  labels:
+    app: front-ui
+    chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+    release: {{ .Release.Name }}
+data:
+  SERVER_PORT: {{ .Values.service.port | quote }}
+  BANK_SECURITY_ENABLED: {{ .Values.security.enabled | quote }}
+  BANK_GATEWAY_BASE_URL: "http://{{ .Values.global.services.gateway.host }}:{{ .Values.global.services.gateway.port }}"
+  SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_FRONT_UI_CLIENT_ID: {{ .Values.security.oauth2.clientId | quote }}
+  SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_FRONT_UI_SCOPE: "openid,profile,email"
+  SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_FRONT_UI_AUTHORIZATION_GRANT_TYPE: authorization_code
+  SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_FRONT_UI_REDIRECT_URI: "{baseUrl}/login/oauth2/code/{registrationId}"
+  SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_FRONT_UI_PROVIDER: keycloak
+  SPRING_SECURITY_OAUTH2_CLIENT_PROVIDER_KEYCLOAK_ISSUER_URI: {{ .Values.global.keycloak.issuerUri | quote }}

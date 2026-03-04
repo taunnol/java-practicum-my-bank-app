@@ -9,4 +9,5 @@ metadata:
 data:
   SERVER_PORT: {{ .Values.service.port | quote }}
   SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: {{ .Values.global.keycloak.issuerUri | quote }}
+  SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: {{ .Values.global.keycloak.jwkSetUri | quote }}
   BANK_SECURITY_ENABLED: {{ .Values.security.enabled | quote }}
