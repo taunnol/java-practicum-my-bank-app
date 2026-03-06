@@ -4,6 +4,7 @@ import org.springframework.cloud.client.circuitbreaker.CircuitBreakerFactory;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.bank.transfer.client.AccountsClient;
 import ru.yandex.practicum.bank.transfer.client.NotificationsClient;
+import ru.yandex.practicum.bank.common.dto.NotificationEvent;
 
 import java.time.OffsetDateTime;
 

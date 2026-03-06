@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.bank.cash.api.dto.CashAction;
 import ru.yandex.practicum.bank.cash.client.AccountsClient;
 import ru.yandex.practicum.bank.cash.client.NotificationsClient;
+import ru.yandex.practicum.bank.common.dto.NotificationEvent;
 
 import java.time.OffsetDateTime;
 

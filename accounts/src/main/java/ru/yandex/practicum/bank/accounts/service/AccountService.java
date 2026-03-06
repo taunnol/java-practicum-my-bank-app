@@ -3,7 +3,7 @@ package ru.yandex.practicum.bank.accounts.service;
 import org.springframework.cloud.client.circuitbreaker.CircuitBreakerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.yandex.practicum.bank.accounts.client.NotificationEvent;
+import ru.yandex.practicum.bank.common.dto.NotificationEvent;
 import ru.yandex.practicum.bank.accounts.client.NotificationsClient;
 import ru.yandex.practicum.bank.accounts.model.Account;
 import ru.yandex.practicum.bank.accounts.repo.AccountRepository;

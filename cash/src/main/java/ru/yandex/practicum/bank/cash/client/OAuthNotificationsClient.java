@@ -3,7 +3,7 @@ package ru.yandex.practicum.bank.cash.client;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
-import ru.yandex.practicum.bank.cash.service.NotificationEvent;
+import ru.yandex.practicum.bank.common.dto.NotificationEvent;
 
 @Component
 @ConditionalOnProperty(name = "bank.security.enabled", havingValue = "true", matchIfMissing = true)
