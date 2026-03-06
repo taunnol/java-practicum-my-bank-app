@@ -10,3 +10,9 @@ management:
     web:
       exposure:
         include: health,info
+resilience4j:
+  timelimiter:
+    configs:
+      default:
+        timeout-duration: 10s
+
