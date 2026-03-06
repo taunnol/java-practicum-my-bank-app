@@ -1,5 +1,7 @@
 package ru.yandex.practicum.bank.transfer.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.cloud.client.circuitbreaker.CircuitBreakerFactory;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.bank.transfer.client.AccountsClient;
@@ -10,6 +12,8 @@ import java.time.OffsetDateTime;
 
 @Service
 public class TransferService {
+
+    private static final Logger log = LoggerFactory.getLogger(TransferService.class);
 
     private final AccountsClient accountsClient;
     private final NotificationsClient notificationsClient;
@@ -54,12 +58,11 @@ public class TransferService {
             throw e;
         }
 
-        circuitBreakerFactory.create("notifications").run(
-                () -> {
-                    notificationsClient.send(new NotificationEvent(
-                            "TRANSFER", amount, fromLogin, toLogin, OffsetDateTime.now()));
-                    return null;
-                },
-                throwable -> null);
+        try {
+            notificationsClient.send(new NotificationEvent(
+                    "TRANSFER", amount, fromLogin, toLogin, OffsetDateTime.now()));
+        } catch (Exception e) {
+            log.warn("Failed to send notification: {}", e.getMessage());
+        }
     }
 }
