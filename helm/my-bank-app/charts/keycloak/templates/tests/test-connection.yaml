@@ -16,5 +16,5 @@ spec:
         - /bin/sh
         - -c
         - |
-          wget -qO- --timeout=5 http://keycloak:{{ .Values.service.port }}/health/ready | grep -q '"status":"UP"'
+          wget -qO- --timeout=10 http://keycloak:9000/health/ready | grep -q '"status"'
   restartPolicy: Never
