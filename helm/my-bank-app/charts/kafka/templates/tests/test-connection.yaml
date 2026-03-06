@@ -16,6 +16,6 @@ spec:
         - /bin/bash
         - -c
         - |
-          /opt/bitnami/kafka/bin/kafka-topics.sh --bootstrap-server kafka:{{ .Values.service.port }} --list &&
-          /opt/bitnami/kafka/bin/kafka-topics.sh --bootstrap-server kafka:{{ .Values.service.port }} --describe --topic {{ .Values.topic.name }}
+          /opt/kafka/bin/kafka-topics.sh --bootstrap-server kafka:{{ .Values.service.port }} --list &&
+          /opt/kafka/bin/kafka-topics.sh --bootstrap-server kafka:{{ .Values.service.port }} --describe --topic {{ .Values.topic.name }}
   restartPolicy: Never

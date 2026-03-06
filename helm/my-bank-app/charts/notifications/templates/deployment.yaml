@@ -18,6 +18,18 @@ spec:
         app: notifications
         release: {{ .Release.Name }}
     spec:
+      initContainers:
+        - name: wait-for-kafka
+          image: busybox:1.36
+          command:
+            - /bin/sh
+            - -c
+            - |
+              until nc -z kafka 9092; do
+                echo "Kafka not available, retrying in 5s..."
+                sleep 5
+              done
+              echo "Kafka is available."
       containers:
         - name: notifications
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"

@@ -25,11 +25,11 @@ spec:
             - -c
             - |
               echo "Waiting for Kafka broker to become ready..."
-              until /opt/bitnami/kafka/bin/kafka-topics.sh --bootstrap-server kafka:{{ .Values.service.port }} --list > /dev/null 2>&1; do
+              until /opt/kafka/bin/kafka-topics.sh --bootstrap-server kafka:{{ .Values.service.port }} --list > /dev/null 2>&1; do
                 sleep 5
               done
               echo "Kafka is ready. Creating topic {{ .Values.topic.name }}..."
-              /opt/bitnami/kafka/bin/kafka-topics.sh --create --if-not-exists \
+              /opt/kafka/bin/kafka-topics.sh --create --if-not-exists \
                 --bootstrap-server kafka:{{ .Values.service.port }} \
                 --topic {{ .Values.topic.name }} \
                 --partitions {{ .Values.topic.partitions }} \
