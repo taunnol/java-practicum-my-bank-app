@@ -33,3 +33,5 @@ build/
 .vscode/
 
 .env
+helm/my-bank-app/charts/*.tgz
+helm/my-bank-app/Chart.lock

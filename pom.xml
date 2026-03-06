@@ -70,11 +70,6 @@
                     <artifactId>maven-surefire-plugin</artifactId>
                     <configuration>
                         <useModulePath>false</useModulePath>
-                        <systemPropertyVariables>
-                            <spring.cloud.consul.enabled>false</spring.cloud.consul.enabled>
-                            <spring.cloud.consul.config.enabled>false</spring.cloud.consul.config.enabled>
-                            <spring.cloud.consul.discovery.enabled>false</spring.cloud.consul.discovery.enabled>
-                        </systemPropertyVariables>
                     </configuration>
                 </plugin>
 

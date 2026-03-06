@@ -1,7 +1,6 @@
 package ru.yandex.practicum.bank.transfer.client;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.oauth2.client.*;
@@ -14,8 +13,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 public class OAuth2WebClientConfig {
 
     @Bean
-    @LoadBalanced
-    public WebClient.Builder loadBalancedWebClientBuilder() {
+    public WebClient.Builder webClientBuilder() {
         return WebClient.builder();
     }
 
@@ -35,13 +33,13 @@ public class OAuth2WebClientConfig {
     }
 
     @Bean
-    public WebClient serviceWebClient(WebClient.Builder loadBalancedWebClientBuilder,
+    public WebClient serviceWebClient(WebClient.Builder webClientBuilder,
                                       OAuth2AuthorizedClientManager manager) {
         ServletOAuth2AuthorizedClientExchangeFilterFunction oauth2 =
                 new ServletOAuth2AuthorizedClientExchangeFilterFunction(manager);
         oauth2.setDefaultClientRegistrationId("transfer-service");
 
-        return loadBalancedWebClientBuilder
+        return webClientBuilder
                 .apply(oauth2.oauth2Configuration())
                 .build();
     }

@@ -1,152 +1,117 @@
 # My Bank App
 
-Микросервисное приложение банка на Spring Boot и Spring Cloud.
+Микросервисное приложение банка на Spring Boot и Spring Cloud с развертыванием в Kubernetes через Helm.
 
 ## Архитектура
 
-| Сервис            | Порт | Назначение                  |
-|-------------------|------|-----------------------------|
-| **front-ui**      | 8080 | Веб-интерфейс               |
-| **gateway**       | 8081 | API Gateway                 |
-| **accounts**      | 8082 | Управление аккаунтами       |
-| **cash**          | 8083 | Пополнение и снятие средств |
-| **transfer**      | 8084 | Переводы между счетами      |
-| **notifications** | 8085 | Уведомления (пишет в лог)   |
+| Сервис            | Контейнерный порт | Назначение                  |
+|-------------------|-------------------|-----------------------------|
+| **front-ui**      | 8080              | Веб-интерфейс               |
+| **gateway**       | 8081              | API Gateway                 |
+| **accounts**      | 8082              | Управление аккаунтами       |
+| **cash**          | 8083              | Пополнение и снятие средств |
+| **transfer**      | 8084              | Переводы между счетами      |
+| **notifications** | 8085              | Уведомления (пишет в лог)   |
 
 ### Инфраструктура
 
-| Компонент  | Порт | Назначение                   |
-|------------|------|------------------------------|
-| PostgreSQL | 5432 | БД для сервиса **accounts**  |
-| Consul     | 8500 | Service Discovery и Config   |
-| Keycloak   | 8088 | Сервер авторизации OAuth 2.0 |
+| Компонент  | Порт внутри кластера | NodePort | Назначение                     |
+|------------|----------------------|----------|--------------------------------|
+| PostgreSQL | 5432                 | —        | БД для **accounts** и Keycloak |
+| Keycloak   | 8080                 | 30088    | Сервер авторизации OAuth 2.0   |
 
 ### Взаимодействие
 
 - **Front UI** аутентифицирует пользователя через Keycloak и выполняет запросы в микросервисы через Gateway, пробрасывая
   JWT-токен.
-- **Gateway** валидирует JWT, проверяет роли и маршрутизирует запросы к сервисам, обнаруженным через Consul.
+- **Gateway** валидирует JWT, проверяет роли и маршрутизирует запросы к сервисам через K8s DNS (Service Discovery).
 - **Микросервисы** (Cash, Transfer, Accounts) авторизуются друг у друга через Keycloak по Client Credentials Flow.
 - Межсервисные вызовы обёрнуты в **Circuit Breaker** (Resilience4j).
+- Конфигурация хранится в **ConfigMaps**  и **Secrets** Kubernetes.
 
 ## Требования к окружению
 
 - Java 21
 - Maven 3.9+ (или `mvnw` в комплекте)
-- Docker и Docker Compose
+- Docker
+- Minikube
+- kubectl
+- Helm 4
 
 ## Сборка
 
-```bash
-./mvnw clean install
-```
-
-# Как запустить
-
-## Локально
-
-Пример с переменными окружения лежит в файле `.env.template` в корне проекта. Для пробного запуска достаточно
-переименовать в `.env`.
-
-### 1. Запуск инфраструктуры
-
-```bash
-docker compose -f docker-compose.infra.yml up -d
-```
-
-### 2. Настройка Keycloak
-
-Конфигурация realm находится в файле `keycloak/bank-realm.json`. Она содержит realm `bank`, клиентов (`front-ui`,
-`cash-service`, `transfer-service`, `accounts-service`), роли и тестовых пользователей.
-
-Импорт:
-
-```bash
-docker exec bank-keycloak /opt/keycloak/bin/kc.sh import --file /opt/keycloak/data/import/bank-realm.json
-```
-
-### 3. Настройка Consul
-
-Добавить общую конфигурацию в Consul KV по ключу `config/application/data`:
-
-```yaml
-spring:
-  security:
-    oauth2:
-      resourceserver:
-        jwt:
-          issuer-uri: http://localhost:8088/realms/bank
-      client:
-        registration:
-          front-ui:
-            client-id: front-ui
-            scope: openid
-            authorization-grant-type: authorization_code
-            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
-          cash-service:
-            client-id: cash-service
-            client-secret: <секрет>
-            authorization-grant-type: client_credentials
-            scope: openid
-          transfer-service:
-            client-id: transfer-service
-            client-secret: <секрет>
-            authorization-grant-type: client_credentials
-            scope: openid
-          accounts-service:
-            client-id: accounts-service
-            client-secret: <секрет>
-            authorization-grant-type: client_credentials
-            scope: openid
-        provider:
-          front-ui:
-            issuer-uri: http://localhost:8088/realms/bank
-          cash-service:
-            issuer-uri: http://localhost:8088/realms/bank
-          transfer-service:
-            issuer-uri: http://localhost:8088/realms/bank
-          accounts-service:
-            issuer-uri: http://localhost:8088/realms/bank
-
-bank:
-  security:
-    enabled: true
-  gateway:
-    base-url: http://localhost:8081
-```
-
-### 4. Запуск сервисов
-
-```bash
-java -jar front-ui/target/my-bank-front-app-0.0.1-SNAPSHOT.jar
-java -jar gateway/target/my-bank-gateway-0.0.1-SNAPSHOT.jar
-java -jar accounts/target/my-bank-accounts-0.0.1-SNAPSHOT.jar
-java -jar cash/target/my-bank-cash-0.0.1-SNAPSHOT.jar
-java -jar transfer/target/my-bank-transfer-0.0.1-SNAPSHOT.jar
-java -jar notifications/target/my-bank-notifications-0.0.1-SNAPSHOT.jar
-```
-
-Открыть http://localhost:8080.
-
-## Через Docker Compose
-
-Запуск:
+### 1. Сборка JAR-файлов
 
 ```bash
 ./mvnw clean package -DskipTests
-docker compose up --build -d
 ```
 
-Остановка:
+### 2. Сборка Docker-образов
 
 ```bash
-docker compose down
+docker build -t my-bank-app/front-ui:latest ./front-ui
+docker build -t my-bank-app/gateway:latest ./gateway
+docker build -t my-bank-app/accounts:latest ./accounts
+docker build -t my-bank-app/cash:latest ./cash
+docker build -t my-bank-app/transfer:latest ./transfer
+docker build -t my-bank-app/notifications:latest ./notifications
 ```
 
-Realm импортируется автоматически при первом старте.
+### 3. Запуск Minikube и загрузка образов
 
-# Запустить тесты
+```bash
+minikube start --driver=docker --ports=30080:30080 --ports=30081:30081 --ports=30088:30088
+minikube image load my-bank-app/front-ui:latest
+minikube image load my-bank-app/gateway:latest
+minikube image load my-bank-app/accounts:latest
+minikube image load my-bank-app/cash:latest
+minikube image load my-bank-app/transfer:latest
+minikube image load my-bank-app/notifications:latest
+```
+
+## Развертывание в Kubernetes (Helm)
+
+### Сборка зависимостей и установка
+
+```bash
+helm dependency build helm/my-bank-app/
+helm install my-bank helm/my-bank-app/
+```
+
+### С переопределением для конкретной среды
+
+```bash
+helm dependency build helm/my-bank-app/
+
+helm install my-bank helm/my-bank-app/ -f helm/my-bank-app/values-dev.yaml -n dev --create-namespace
+
+helm install my-bank helm/my-bank-app/ -f helm/my-bank-app/values-prod.yaml -n prod --create-namespace
+```
+
+### Удаление
+
+```bash
+helm uninstall my-bank
+```
+
+## Доступ к приложению
+
+| Компонент | URL                    | Назначение             |
+|-----------|------------------------|------------------------|
+| Front UI  | http://localhost:30080 | Веб-интерфейс          |
+| Gateway   | http://localhost:30081 | API Gateway            |
+| Keycloak  | http://localhost:30088 | Админ-панель OAuth 2.0 |
+
+## Запустить тесты
+
+### Java
 
 ```bash
 ./mvnw test
+```
+
+### Helm
+
+```bash
+helm test my-bank
 ```
