@@ -19,9 +19,6 @@ database:
 
 security:
   enabled: true
-  oauth2:
-    clientId: accounts-service
-    clientSecret: accounts-service-secret
 
 resources:
   requests:
