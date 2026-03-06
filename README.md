@@ -4,30 +4,34 @@
 
 ## Архитектура
 
-| Сервис            | Контейнерный порт | Назначение                  |
-|-------------------|-------------------|-----------------------------|
-| **front-ui**      | 8080              | Веб-интерфейс               |
-| **gateway**       | 8081              | API Gateway                 |
-| **accounts**      | 8082              | Управление аккаунтами       |
-| **cash**          | 8083              | Пополнение и снятие средств |
-| **transfer**      | 8084              | Переводы между счетами      |
-| **notifications** | 8085              | Уведомления (пишет в лог)   |
+| Сервис            | Контейнерный порт | Назначение                                 |
+|-------------------|-------------------|--------------------------------------------|
+| **front-ui**      | 8080              | Веб-интерфейс                              |
+| **gateway**       | 8081              | API Gateway                                |
+| **accounts**      | 8082              | Управление аккаунтами                      |
+| **cash**          | 8083              | Пополнение и снятие средств                |
+| **transfer**      | 8084              | Переводы между счетами                     |
+| **notifications** | —                 | Уведомления (Kafka-консьюмер, пишет в лог) |
 
 ### Инфраструктура
 
-| Компонент  | Порт внутри кластера | NodePort | Назначение                     |
-|------------|----------------------|----------|--------------------------------|
-| PostgreSQL | 5432                 | —        | БД для **accounts** и Keycloak |
-| Keycloak   | 8080                 | 30088    | Сервер авторизации OAuth 2.0   |
+| Компонент    | Порт внутри кластера | NodePort | Назначение                     |
+|--------------|----------------------|----------|--------------------------------|
+| PostgreSQL   | 5432                 | —        | БД для **accounts** и Keycloak |
+| Keycloak     | 8080                 | 30088    | Сервер авторизации OAuth 2.0   |
+| Apache Kafka | 9092                 | —        | Брокер сообщений               |
 
 ### Взаимодействие
 
 - **Front UI** аутентифицирует пользователя через Keycloak и выполняет запросы в микросервисы через Gateway, пробрасывая
   JWT-токен.
-- **Gateway** валидирует JWT, проверяет роли и маршрутизирует запросы к сервисам через K8s DNS (Service Discovery).
-- **Микросервисы** (Cash, Transfer, Accounts) авторизуются друг у друга через Keycloak по Client Credentials Flow.
-- Межсервисные вызовы обёрнуты в **Circuit Breaker** (Resilience4j).
-- Конфигурация хранится в **ConfigMaps**  и **Secrets** Kubernetes.
+- **Gateway** валидирует JWT, проверяет роли и маршрутизирует запросы к сервисам Accounts, Cash и Transfer через K8s
+  DNS (Service Discovery).
+- **Cash** и **Transfer** авторизуются в Accounts через Keycloak по Client Credentials Flow. Межсервисные REST-вызовы
+  обёрнуты в Circuit Breaker (Resilience4j).
+- **Accounts**, **Cash** и **Transfer** отправляют уведомления в топик `bank.notifications` через Apache Kafka.
+- **Notifications** читает сообщения из топика `bank.notifications` (Kafka Consumer) и логирует уведомления.
+- Конфигурация хранится в **ConfigMaps** и **Secrets** Kubernetes.
 
 ## Требования к окружению
 
@@ -87,6 +91,8 @@ helm install my-bank helm/my-bank-app/ -f helm/my-bank-app/values-dev.yaml -n de
 
 helm install my-bank helm/my-bank-app/ -f helm/my-bank-app/values-prod.yaml -n prod --create-namespace
 ```
+
+При установке Kafka-сабчарт автоматически создаёт StatefulSet с брокером и Job для создания топика `bank.notifications`.
 
 ### Удаление
 

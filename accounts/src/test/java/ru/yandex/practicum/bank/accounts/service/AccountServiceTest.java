@@ -5,8 +5,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.cloud.client.circuitbreaker.CircuitBreaker;
-import org.springframework.cloud.client.circuitbreaker.CircuitBreakerFactory;
 import ru.yandex.practicum.bank.accounts.client.NotificationsClient;
 import ru.yandex.practicum.bank.accounts.model.Account;
 import ru.yandex.practicum.bank.accounts.repo.AccountRepository;
@@ -14,12 +12,9 @@ import ru.yandex.practicum.bank.accounts.repo.AccountRepository;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Function;
-import java.util.function.Supplier;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -31,20 +26,11 @@ class AccountServiceTest {
     @Mock
     private NotificationsClient notificationsClient;
 
-    @Mock
-    private CircuitBreakerFactory<?, ?> circuitBreakerFactory;
-
-    @Mock
-    private CircuitBreaker circuitBreaker;
-
     private AccountService service;
 
     @BeforeEach
     void setUp() {
-        lenient().when(circuitBreakerFactory.create(anyString())).thenReturn(circuitBreaker);
-        lenient().when(circuitBreaker.run(any(Supplier.class), any(Function.class)))
-                .thenAnswer(inv -> ((Supplier<?>) inv.getArgument(0)).get());
-        service = new AccountService(repo, notificationsClient, circuitBreakerFactory);
+        service = new AccountService(repo, notificationsClient);
     }
 
     @Test

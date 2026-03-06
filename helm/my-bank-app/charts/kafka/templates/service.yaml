@@ -1,25 +1,23 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: keycloak
+  name: kafka
   labels:
-    app: keycloak
+    app: kafka
     chart: {{ .Chart.Name }}-{{ .Chart.Version }}
     release: {{ .Release.Name }}
 spec:
-  type: {{ .Values.service.type }}
+  clusterIP: None
+  publishNotReadyAddresses: true
   ports:
     - port: {{ .Values.service.port }}
       targetPort: {{ .Values.service.port }}
       protocol: TCP
-      name: http
-      {{- if and (eq .Values.service.type "NodePort") .Values.service.nodePort }}
-      nodePort: {{ .Values.service.nodePort }}
-      {{- end }}
-    - port: 9000
-      targetPort: 9000
+      name: plaintext
+    - port: {{ .Values.service.controllerPort }}
+      targetPort: {{ .Values.service.controllerPort }}
       protocol: TCP
-      name: management
+      name: controller
   selector:
-    app: keycloak
+    app: kafka
     release: {{ .Release.Name }}

@@ -3,6 +3,7 @@ package ru.yandex.practicum.bank.transfer.contracts;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.contract.stubrunner.spring.AutoConfigureStubRunner;
+import org.springframework.kafka.test.context.EmbeddedKafka;
 import org.springframework.cloud.contract.stubrunner.spring.StubRunnerProperties;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.client.RestClient;
@@ -12,6 +13,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 
 @SpringBootTest(properties = "bank.security.enabled=false")
+@EmbeddedKafka(partitions = 1, topics = "bank.notifications")
 @AutoConfigureStubRunner(
         stubsMode = StubRunnerProperties.StubsMode.CLASSPATH,
         ids = "ru.yandex.practicum:my-bank-accounts:+:stubs:9561"

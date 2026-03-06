@@ -1,6 +1,6 @@
 package ru.yandex.practicum.bank.transfer.client;
 
-import ru.yandex.practicum.bank.transfer.service.NotificationEvent;
+import ru.yandex.practicum.bank.common.dto.NotificationEvent;
 
 public interface NotificationsClient {
     void send(NotificationEvent event);
