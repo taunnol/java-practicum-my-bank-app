@@ -1,6 +1,7 @@
 package ru.yandex.practicum.mybankfront.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -20,6 +21,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+@Slf4j
 @Controller
 public class MainController {
 
@@ -38,9 +40,12 @@ public class MainController {
 
     @GetMapping("/account")
     public String getAccount(Model model, OAuth2AuthenticationToken authentication) {
+        String login = authentication.getName();
+        log.debug("Account page requested: login={}", login);
         try {
             fillModelFromBackend(model, authentication, null, null);
         } catch (Exception e) {
+            log.warn("Failed to load account page: login={}, error={}", login, e.getMessage());
             fillEmptyModel(model, List.of(humanMessage(e)), null);
         }
         return "main";
@@ -53,12 +58,17 @@ public class MainController {
             @RequestParam("birthdate") LocalDate birthdate,
             OAuth2AuthenticationToken authentication
     ) {
+        String login = authentication.getName();
+        log.info("Profile update request: login={}, name={}", login, name);
         try {
             gatewayApiClient.patchJson("/api/accounts/me", new EditAccountRequest(name, birthdate), authentication);
+            log.info("Profile updated successfully: login={}", login);
             fillModelFromBackend(model, authentication, null, "Изменения сохранены");
         } catch (RestClientResponseException e) {
+            log.warn("Profile update failed: login={}, status={}", login, e.getStatusCode().value());
             fillModelFromBackendSafe(model, authentication, extractErrors(e), null);
         } catch (Exception e) {
+            log.error("Profile update error: login={}, error={}", login, e.getMessage());
             fillModelFromBackendSafe(model, authentication, List.of(humanMessage(e)), null);
         }
         return "main";
@@ -71,6 +81,8 @@ public class MainController {
             @RequestParam("action") CashAction action,
             OAuth2AuthenticationToken authentication
     ) {
+        String login = authentication.getName();
+        log.info("Cash operation request: login={}, action={}, amount={}", login, action, value);
         try {
             gatewayApiClient.postJson("/api/cash", new CashRequest(value, action), authentication, Void.class);
 
@@ -78,10 +90,14 @@ public class MainController {
                     ? "Снято %d руб".formatted(value)
                     : "Положено %d руб".formatted(value);
 
+            log.info("Cash operation successful: login={}, action={}, amount={}", login, action, value);
             fillModelFromBackend(model, authentication, null, info);
         } catch (RestClientResponseException e) {
+            log.warn("Cash operation failed: login={}, action={}, amount={}, status={}",
+                    login, action, value, e.getStatusCode().value());
             fillModelFromBackendSafe(model, authentication, extractErrors(e), null);
         } catch (Exception e) {
+            log.error("Cash operation error: login={}, action={}, error={}", login, action, e.getMessage());
             fillModelFromBackendSafe(model, authentication, List.of(humanMessage(e)), null);
         }
         return "main";
@@ -94,6 +110,8 @@ public class MainController {
             @RequestParam("login") String login,
             OAuth2AuthenticationToken authentication
     ) {
+        String fromLogin = authentication.getName();
+        log.info("Transfer request: from={}, to={}, amount={}", fromLogin, login, value);
         try {
             List<AccountDto> recipients = fetchRecipients(authentication);
             String recipientName = recipients.stream()
@@ -104,11 +122,15 @@ public class MainController {
 
             gatewayApiClient.postJson("/api/transfers", new TransferRequest(value, login), authentication, Void.class);
 
+            log.info("Transfer successful: from={}, to={}, amount={}", fromLogin, login, value);
             String info = "Успешно переведено %d руб клиенту %s".formatted(value, recipientName);
             fillModelFromBackend(model, authentication, null, info);
         } catch (RestClientResponseException e) {
+            log.warn("Transfer failed: from={}, to={}, amount={}, status={}",
+                    fromLogin, login, value, e.getStatusCode().value());
             fillModelFromBackendSafe(model, authentication, extractErrors(e), null);
         } catch (Exception e) {
+            log.error("Transfer error: from={}, to={}, error={}", fromLogin, login, e.getMessage());
             fillModelFromBackendSafe(model, authentication, List.of(humanMessage(e)), null);
         }
         return "main";
