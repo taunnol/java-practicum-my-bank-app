@@ -1,13 +1,16 @@
 package ru.yandex.practicum.bank.cash.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.client.circuitbreaker.CircuitBreakerFactory;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.bank.cash.api.dto.CashAction;
 import ru.yandex.practicum.bank.cash.client.AccountsClient;
 import ru.yandex.practicum.bank.cash.client.NotificationsClient;
+import ru.yandex.practicum.bank.common.dto.NotificationEvent;
 
 import java.time.OffsetDateTime;
 
+@Slf4j
 @Service
 public class CashService {
 
@@ -46,11 +49,10 @@ public class CashService {
     }
 
     private void sendNotification(NotificationEvent event) {
-        circuitBreakerFactory.create("notifications").run(
-                () -> {
-                    notificationsClient.send(event);
-                    return null;
-                },
-                throwable -> null);
+        try {
+            notificationsClient.send(event);
+        } catch (Exception e) {
+            log.warn("Failed to send notification: {}", e.getMessage());
+        }
     }
 }

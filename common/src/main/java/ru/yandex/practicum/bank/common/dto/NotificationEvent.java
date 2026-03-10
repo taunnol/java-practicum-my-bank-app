@@ -1,4 +1,4 @@
-package ru.yandex.practicum.bank.accounts.client;
+package ru.yandex.practicum.bank.common.dto;
 
 import java.time.OffsetDateTime;
 

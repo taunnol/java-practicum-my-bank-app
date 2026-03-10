@@ -18,13 +18,22 @@ spec:
         app: notifications
         release: {{ .Release.Name }}
     spec:
+      initContainers:
+        - name: wait-for-kafka
+          image: busybox:1.36
+          command:
+            - /bin/sh
+            - -c
+            - |
+              until nc -z kafka 9092; do
+                echo "Kafka not available, retrying in 5s..."
+                sleep 5
+              done
+              echo "Kafka is available."
       containers:
         - name: notifications
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
-          ports:
-            - containerPort: {{ .Values.service.containerPort }}
-              name: http
           envFrom:
             - configMapRef:
                 name: {{ .Release.Name }}-notifications-config
@@ -32,16 +41,20 @@ spec:
             - name: app-config
               mountPath: /app/config
           readinessProbe:
-            httpGet:
-              path: /actuator/health
-              port: {{ .Values.service.containerPort }}
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - pgrep -f app.jar
             initialDelaySeconds: 30
             periodSeconds: 10
             timeoutSeconds: 5
           livenessProbe:
-            httpGet:
-              path: /actuator/health
-              port: {{ .Values.service.containerPort }}
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - pgrep -f app.jar
             initialDelaySeconds: 60
             periodSeconds: 15
             timeoutSeconds: 5

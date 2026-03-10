@@ -19,6 +19,18 @@ postgres:
       cpu: 1000m
       memory: 1Gi
 
+kafka:
+  persistence:
+    enabled: true
+    size: 5Gi
+  resources:
+    requests:
+      cpu: 500m
+      memory: 512Mi
+    limits:
+      cpu: 1000m
+      memory: 1Gi
+
 keycloak:
   resources:
     requests:

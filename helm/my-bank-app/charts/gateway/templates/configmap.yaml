@@ -35,7 +35,3 @@ data:
               uri: "http://{{ .Values.global.services.transfer.host }}:{{ .Values.global.services.transfer.port }}"
               predicates:
                 - "Path=/api/transfers/**"
-            - id: notifications
-              uri: "http://{{ .Values.global.services.notifications.host }}:{{ .Values.global.services.notifications.port }}"
-              predicates:
-                - "Path=/api/notifications/**"

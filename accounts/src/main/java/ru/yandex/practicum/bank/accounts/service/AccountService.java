@@ -1,9 +1,9 @@
 package ru.yandex.practicum.bank.accounts.service;
 
-import org.springframework.cloud.client.circuitbreaker.CircuitBreakerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.yandex.practicum.bank.accounts.client.NotificationEvent;
+import ru.yandex.practicum.bank.common.dto.NotificationEvent;
 import ru.yandex.practicum.bank.accounts.client.NotificationsClient;
 import ru.yandex.practicum.bank.accounts.model.Account;
 import ru.yandex.practicum.bank.accounts.repo.AccountRepository;
@@ -13,19 +13,17 @@ import java.time.OffsetDateTime;
 import java.time.Period;
 import java.util.List;
 
+@Slf4j
 @Service
 public class AccountService {
 
     private final AccountRepository repo;
     private final NotificationsClient notificationsClient;
-    private final CircuitBreakerFactory<?, ?> circuitBreakerFactory;
 
     public AccountService(AccountRepository repo,
-                          NotificationsClient notificationsClient,
-                          CircuitBreakerFactory<?, ?> circuitBreakerFactory) {
+                          NotificationsClient notificationsClient) {
         this.repo = repo;
         this.notificationsClient = notificationsClient;
-        this.circuitBreakerFactory = circuitBreakerFactory;
     }
 
     private static void validateAdult(LocalDate birthdate) {
@@ -94,11 +92,10 @@ public class AccountService {
     }
 
     private void sendNotification(NotificationEvent event) {
-        circuitBreakerFactory.create("notifications").run(
-                () -> {
-                    notificationsClient.send(event);
-                    return null;
-                },
-                throwable -> null);
+        try {
+            notificationsClient.send(event);
+        } catch (Exception e) {
+            log.warn("Failed to send notification: {}", e.getMessage());
+        }
     }
 }

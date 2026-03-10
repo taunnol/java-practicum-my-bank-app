@@ -16,6 +16,10 @@ spec:
       {{- if and (eq .Values.service.type "NodePort") .Values.service.nodePort }}
       nodePort: {{ .Values.service.nodePort }}
       {{- end }}
+    - port: 9000
+      targetPort: 9000
+      protocol: TCP
+      name: management
   selector:
     app: keycloak
     release: {{ .Release.Name }}

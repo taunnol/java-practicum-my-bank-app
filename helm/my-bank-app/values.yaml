@@ -15,6 +15,9 @@ global:
     jwkSetUri: http://keycloak:8080/realms/bank/protocol/openid-connect/certs
     tokenUri: http://keycloak:8080/realms/bank/protocol/openid-connect/token
 
+  kafka:
+    bootstrapServers: kafka:9092
+
   services:
     accounts:
       host: accounts
@@ -39,6 +42,9 @@ postgres:
   enabled: true
 
 keycloak:
+  enabled: true
+
+kafka:
   enabled: true
 
 accounts:
