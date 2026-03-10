@@ -21,6 +21,17 @@
 | Keycloak     | 8080                 | 30088    | Сервер авторизации OAuth 2.0   |
 | Apache Kafka | 9092                 | —        | Брокер сообщений               |
 
+### Observability
+
+| Компонент     | Порт внутри кластера | NodePort | Назначение                     |
+|---------------|----------------------|----------|--------------------------------|
+| Zipkin        | 9411                 | 30411    | Распределённая трассировка     |
+| Prometheus    | 9090                 | 30090    | Сбор метрик                    |
+| Grafana       | 3000                 | 30300    | Дашборды и визуализация метрик |
+| Elasticsearch | 9200, 9300           | —        | Хранилище логов                |
+| Logstash      | 5000, 9600           | —        | Приём и обработка логов        |
+| Kibana        | 5601                 | 30601    | Поиск и анализ логов           |
+
 ### Взаимодействие
 
 - **Front UI** аутентифицирует пользователя через Keycloak и выполняет запросы в микросервисы через Gateway, пробрасывая
@@ -32,6 +43,11 @@
 - **Accounts**, **Cash** и **Transfer** отправляют уведомления в топик `bank.notifications` через Apache Kafka.
 - **Notifications** читает сообщения из топика `bank.notifications` (Kafka Consumer) и логирует уведомления.
 - Конфигурация хранится в **ConfigMaps** и **Secrets** Kubernetes.
+- Все микросервисы инструментированы через **Micrometer Tracing + Brave**.
+- Запросы между сервисами, вызовы Kafka и JDBC-запросы в `accounts` отображаются как цепочки спанов.
+- Все сервисы экспонируют метрики на `/actuator/prometheus`. Prometheus собирает их каждые 15 секунд.
+- Все сервисы пишут логи в JSON-формате через **Logback + LogstashEncoder** и отправляют их в Logstash.
+  Каждое лог-событие содержит `traceId` и `spanId` для корреляции с трейсами в Zipkin.
 
 ## Требования к окружению
 
@@ -64,7 +80,14 @@ docker build -t my-bank-app/notifications:latest ./notifications
 ### 3. Запуск Minikube и загрузка образов
 
 ```bash
-minikube start --driver=docker --ports=30080:30080 --ports=30081:30081 --ports=30088:30088
+minikube start --driver=docker \
+  --ports=30080:30080 \
+  --ports=30081:30081 \
+  --ports=30088:30088 \
+  --ports=30411:30411 \
+  --ports=30090:30090 \
+  --ports=30300:30300 \
+  --ports=30601:30601
 minikube image load my-bank-app/front-ui:latest
 minikube image load my-bank-app/gateway:latest
 minikube image load my-bank-app/accounts:latest
@@ -102,11 +125,17 @@ helm uninstall my-bank
 
 ## Доступ к приложению
 
-| Компонент | URL                    | Назначение             |
-|-----------|------------------------|------------------------|
-| Front UI  | http://localhost:30080 | Веб-интерфейс          |
-| Gateway   | http://localhost:30081 | API Gateway            |
-| Keycloak  | http://localhost:30088 | Админ-панель OAuth 2.0 |
+| Компонент  | URL                    | Назначение                 |
+|------------|------------------------|----------------------------|
+| Front UI   | http://localhost:30080 | Веб-интерфейс              |
+| Gateway    | http://localhost:30081 | API Gateway                |
+| Keycloak   | http://localhost:30088 | Админ-панель OAuth 2.0     |
+| Zipkin     | http://localhost:30411 | Распределённая трассировка |
+| Prometheus | http://localhost:30090 | Метрики                    |
+| Grafana    | http://localhost:30300 | Дашборды                   |
+| Kibana     | http://localhost:30601 | Централизованные логи      |
+
+Для просмотра логов нужно создать Data View с паттерном `bank-logs-*`.
 
 ## Запустить тесты
 
