@@ -17,6 +17,8 @@ data:
         name: accounts
       datasource:
         url: jdbc:postgresql://{{ .Values.database.host }}:{{ .Values.database.port }}/{{ .Values.database.name }}
+        observation:
+          enabled: true
       security:
         oauth2:
           resourceserver:
