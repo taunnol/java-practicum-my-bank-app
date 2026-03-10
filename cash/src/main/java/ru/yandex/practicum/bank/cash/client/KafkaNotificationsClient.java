@@ -1,6 +1,5 @@
 package ru.yandex.practicum.bank.cash.client;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.bank.common.dto.NotificationEvent;
@@ -9,16 +8,16 @@ import ru.yandex.practicum.bank.common.dto.NotificationEvent;
 public class KafkaNotificationsClient implements NotificationsClient {
 
     private final KafkaTemplate<String, NotificationEvent> kafkaTemplate;
+    private final KafkaTopicProperties kafkaTopicProperties;
 
-    @Value("${bank.kafka.topic.notifications}")
-    private String topic;
-
-    public KafkaNotificationsClient(KafkaTemplate<String, NotificationEvent> kafkaTemplate) {
+    public KafkaNotificationsClient(KafkaTemplate<String, NotificationEvent> kafkaTemplate,
+                                    KafkaTopicProperties kafkaTopicProperties) {
         this.kafkaTemplate = kafkaTemplate;
+        this.kafkaTopicProperties = kafkaTopicProperties;
     }
 
     @Override
     public void send(NotificationEvent event) {
-        kafkaTemplate.send(topic, event.actorLogin(), event);
+        kafkaTemplate.send(kafkaTopicProperties.getNotifications(), event.actorLogin(), event);
     }
 }
