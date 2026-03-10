@@ -1,5 +1,7 @@
 package ru.yandex.practicum.bank.accounts.service;
 
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -26,11 +28,14 @@ class AccountServiceTest {
     @Mock
     private NotificationsClient notificationsClient;
 
+    private MeterRegistry meterRegistry;
+
     private AccountService service;
 
     @BeforeEach
     void setUp() {
-        service = new AccountService(repo, notificationsClient);
+        meterRegistry = new SimpleMeterRegistry();
+        service = new AccountService(repo, notificationsClient, meterRegistry);
     }
 
     @Test

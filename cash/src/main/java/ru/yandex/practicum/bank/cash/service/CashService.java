@@ -32,19 +32,28 @@ public class CashService {
         }
 
         if (action == CashAction.PUT) {
+            log.info("Deposit request: login={}, amount={}", login, value);
             circuitBreakerFactory.create("accounts-deposit").run(
                     () -> {
                         accountsClient.deposit(login, value);
                         return null;
                     });
+            log.info("Deposit successful: login={}, amount={}", login, value);
             sendNotification(new NotificationEvent("CASH_IN", value, login, null, OffsetDateTime.now()));
         } else {
-            circuitBreakerFactory.create("accounts-withdraw").run(
-                    () -> {
-                        accountsClient.withdraw(login, value);
-                        return null;
-                    });
-            sendNotification(new NotificationEvent("CASH_OUT", value, login, null, OffsetDateTime.now()));
+            log.info("Withdrawal request: login={}, amount={}", login, value);
+            try {
+                circuitBreakerFactory.create("accounts-withdraw").run(
+                        () -> {
+                            accountsClient.withdraw(login, value);
+                            return null;
+                        });
+                log.info("Withdrawal successful: login={}, amount={}", login, value);
+                sendNotification(new NotificationEvent("CASH_OUT", value, login, null, OffsetDateTime.now()));
+            } catch (RuntimeException e) {
+                log.warn("Withdrawal failed: login={}, amount={}, reason={}", login, value, e.getMessage());
+                throw e;
+            }
         }
     }
 
@@ -52,7 +61,8 @@ public class CashService {
         try {
             notificationsClient.send(event);
         } catch (Exception e) {
-            log.warn("Failed to send notification: {}", e.getMessage());
+            log.warn("Failed to send notification: type={}, login={}, error={}",
+                    event.type(), event.actorLogin(), e.getMessage());
         }
     }
 }

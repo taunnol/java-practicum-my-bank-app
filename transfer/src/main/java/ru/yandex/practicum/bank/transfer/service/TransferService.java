@@ -1,5 +1,6 @@
 package ru.yandex.practicum.bank.transfer.service;
 
+import io.micrometer.core.instrument.MeterRegistry;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.client.circuitbreaker.CircuitBreakerFactory;
 import org.springframework.stereotype.Service;
@@ -16,13 +17,16 @@ public class TransferService {
     private final AccountsClient accountsClient;
     private final NotificationsClient notificationsClient;
     private final CircuitBreakerFactory<?, ?> circuitBreakerFactory;
+    private final MeterRegistry meterRegistry;
 
     public TransferService(AccountsClient accountsClient,
                            NotificationsClient notificationsClient,
-                           CircuitBreakerFactory<?, ?> circuitBreakerFactory) {
+                           CircuitBreakerFactory<?, ?> circuitBreakerFactory,
+                           MeterRegistry meterRegistry) {
         this.accountsClient = accountsClient;
         this.notificationsClient = notificationsClient;
         this.circuitBreakerFactory = circuitBreakerFactory;
+        this.meterRegistry = meterRegistry;
     }
 
     public void transfer(String fromLogin, String toLogin, long amount) {
@@ -36,11 +40,21 @@ public class TransferService {
             throw new IllegalArgumentException("Нельзя переводить самому себе");
         }
 
-        circuitBreakerFactory.create("accounts-withdraw").run(
-                () -> {
-                    accountsClient.withdraw(fromLogin, amount);
-                    return null;
-                });
+        log.info("Transfer request: from={}, to={}, amount={}", fromLogin, toLogin, amount);
+
+        try {
+            circuitBreakerFactory.create("accounts-withdraw").run(
+                    () -> {
+                        accountsClient.withdraw(fromLogin, amount);
+                        return null;
+                    });
+        } catch (RuntimeException e) {
+            log.warn("Transfer failed — withdrawal error: from={}, to={}, amount={}, reason={}",
+                    fromLogin, toLogin, amount, e.getMessage());
+            meterRegistry.counter("bank.transfer.failed",
+                    "sender", fromLogin, "recipient", toLogin).increment();
+            throw e;
+        }
 
         try {
             circuitBreakerFactory.create("accounts-deposit").run(
@@ -49,18 +63,28 @@ public class TransferService {
                         return null;
                     });
         } catch (RuntimeException e) {
+            log.error("Transfer failed — deposit error, reverting: from={}, to={}, amount={}, reason={}",
+                    fromLogin, toLogin, amount, e.getMessage());
+            meterRegistry.counter("bank.transfer.failed",
+                    "sender", fromLogin, "recipient", toLogin).increment();
             try {
                 accountsClient.deposit(fromLogin, amount);
-            } catch (RuntimeException ignored) {
+                log.info("Compensating deposit successful: login={}, amount={}", fromLogin, amount);
+            } catch (RuntimeException compensationEx) {
+                log.error("Compensating deposit failed: login={}, amount={}, reason={}",
+                        fromLogin, amount, compensationEx.getMessage());
             }
             throw e;
         }
+
+        log.info("Transfer successful: from={}, to={}, amount={}", fromLogin, toLogin, amount);
 
         try {
             notificationsClient.send(new NotificationEvent(
                     "TRANSFER", amount, fromLogin, toLogin, OffsetDateTime.now()));
         } catch (Exception e) {
-            log.warn("Failed to send notification: {}", e.getMessage());
+            log.warn("Failed to send transfer notification: from={}, to={}, error={}",
+                    fromLogin, toLogin, e.getMessage());
         }
     }
 }
