@@ -1,16 +1,14 @@
 package ru.yandex.practicum.bank.notifications.kafka;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.bank.common.dto.NotificationEvent;
 
+@Slf4j
 @Component
 public class NotificationListener {
-
-    private static final Logger log = LoggerFactory.getLogger(NotificationListener.class);
 
     @KafkaListener(
             topics = "${bank.kafka.topic.notifications}",

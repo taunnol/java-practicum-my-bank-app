@@ -17,6 +17,12 @@
 
     <dependencies>
         <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+        <dependency>
             <groupId>ru.yandex.practicum</groupId>
             <artifactId>my-bank-common</artifactId>
             <version>${project.version}</version>

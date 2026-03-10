@@ -1,7 +1,6 @@
 package ru.yandex.practicum.bank.transfer.service;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.client.circuitbreaker.CircuitBreakerFactory;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.bank.transfer.client.AccountsClient;
@@ -10,10 +9,9 @@ import ru.yandex.practicum.bank.common.dto.NotificationEvent;
 
 import java.time.OffsetDateTime;
 
+@Slf4j
 @Service
 public class TransferService {
-
-    private static final Logger log = LoggerFactory.getLogger(TransferService.class);
 
     private final AccountsClient accountsClient;
     private final NotificationsClient notificationsClient;

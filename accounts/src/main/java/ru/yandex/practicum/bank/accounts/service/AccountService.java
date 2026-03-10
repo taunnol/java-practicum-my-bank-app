@@ -1,7 +1,6 @@
 package ru.yandex.practicum.bank.accounts.service;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.yandex.practicum.bank.common.dto.NotificationEvent;
@@ -14,10 +13,9 @@ import java.time.OffsetDateTime;
 import java.time.Period;
 import java.util.List;
 
+@Slf4j
 @Service
 public class AccountService {
-
-    private static final Logger log = LoggerFactory.getLogger(AccountService.class);
 
     private final AccountRepository repo;
     private final NotificationsClient notificationsClient;
