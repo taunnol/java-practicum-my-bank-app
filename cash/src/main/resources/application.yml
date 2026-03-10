@@ -21,6 +21,10 @@ management:
       exposure:
         include: health,info
 
+logstash:
+  host: ${LOGSTASH_HOST:localhost}
+  port: ${LOGSTASH_PORT:5000}
+
 bank:
   kafka:
     topic:

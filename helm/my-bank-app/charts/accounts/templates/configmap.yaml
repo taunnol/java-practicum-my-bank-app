@@ -32,6 +32,9 @@ data:
           properties:
             enable.idempotence: true
             spring.json.add.type.headers: false
+    logstash:
+      host: logstash
+      port: 5000
     management:
       endpoints:
         web:

@@ -18,6 +18,10 @@ spring:
     listener:
       ack-mode: manual_immediate
 
+logstash:
+  host: ${LOGSTASH_HOST:localhost}
+  port: ${LOGSTASH_PORT:5000}
+
 bank:
   kafka:
     topic:

@@ -37,6 +37,9 @@ data:
               uri: "http://{{ .Values.global.services.transfer.host }}:{{ .Values.global.services.transfer.port }}"
               predicates:
                 - "Path=/api/transfers/**"
+    logstash:
+      host: logstash
+      port: 5000
     management:
       endpoints:
         web:
