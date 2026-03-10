@@ -29,6 +29,15 @@ data:
         listener:
           ack-mode: manual_immediate
     management:
+      server:
+        port: 8085
+      endpoints:
+        web:
+          exposure:
+            include: health,info,prometheus,metrics
+      metrics:
+        tags:
+          application: notifications
       tracing:
         sampling:
           probability: 1.0

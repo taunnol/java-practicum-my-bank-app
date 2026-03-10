@@ -1,20 +1,20 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: {{ .Release.Name }}-notifications-test
+  name: {{ .Release.Name }}-prometheus-test
   labels:
-    app: notifications
+    app: prometheus
     chart: {{ .Chart.Name }}-{{ .Chart.Version }}
     release: {{ .Release.Name }}
   annotations:
     "helm.sh/hook": test
 spec:
   containers:
-    - name: notifications-test
+    - name: prometheus-test
       image: busybox:1.36
       command:
         - /bin/sh
         - -c
         - |
-          wget -qO- --timeout=10 http://notifications:8085/actuator/health | grep -q '"status"'
+          wget -qO- --timeout=10 http://prometheus:{{ .Values.service.port }}/-/healthy | grep -q "Prometheus"
   restartPolicy: Never

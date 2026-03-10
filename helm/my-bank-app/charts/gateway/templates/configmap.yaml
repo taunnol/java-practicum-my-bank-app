@@ -38,6 +38,13 @@ data:
               predicates:
                 - "Path=/api/transfers/**"
     management:
+      endpoints:
+        web:
+          exposure:
+            include: health,info,prometheus,metrics
+      metrics:
+        tags:
+          application: gateway
       tracing:
         sampling:
           probability: 1.0

@@ -34,6 +34,13 @@ data:
                 jwk-set-uri: {{ .Values.global.keycloak.jwkSetUri }}
                 user-name-attribute: preferred_username
     management:
+      endpoints:
+        web:
+          exposure:
+            include: health,info,prometheus,metrics
+      metrics:
+        tags:
+          application: front-ui
       tracing:
         sampling:
           probability: 1.0

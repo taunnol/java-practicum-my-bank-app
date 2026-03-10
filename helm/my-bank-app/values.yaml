@@ -71,3 +71,6 @@ front-ui:
 
 zipkin:
   enabled: true
+
+prometheus:
+  enabled: true
