@@ -13,6 +13,8 @@ data:
   SPRING_CONFIG_ADDITIONAL_LOCATION: /app/config/
   application.yml: |
     spring:
+      application:
+        name: accounts
       datasource:
         url: jdbc:postgresql://{{ .Values.database.host }}:{{ .Values.database.port }}/{{ .Values.database.name }}
       security:
@@ -30,6 +32,13 @@ data:
           properties:
             enable.idempotence: true
             spring.json.add.type.headers: false
+    management:
+      tracing:
+        sampling:
+          probability: 1.0
+      zipkin:
+        tracing:
+          endpoint: http://{{ .Values.global.zipkin.host }}:{{ .Values.global.zipkin.port }}/api/v2/spans
     bank:
       kafka:
         topic:

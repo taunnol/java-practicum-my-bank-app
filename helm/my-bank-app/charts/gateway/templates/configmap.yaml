@@ -12,6 +12,8 @@ data:
   SPRING_CONFIG_ADDITIONAL_LOCATION: /app/config/
   application.yml: |
     spring:
+      application:
+        name: gateway
       security:
         oauth2:
           resourceserver:
@@ -35,3 +37,10 @@ data:
               uri: "http://{{ .Values.global.services.transfer.host }}:{{ .Values.global.services.transfer.port }}"
               predicates:
                 - "Path=/api/transfers/**"
+    management:
+      tracing:
+        sampling:
+          probability: 1.0
+      zipkin:
+        tracing:
+          endpoint: http://{{ .Values.global.zipkin.host }}:{{ .Values.global.zipkin.port }}/api/v2/spans
