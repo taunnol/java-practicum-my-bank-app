@@ -18,6 +18,20 @@ spring:
     listener:
       ack-mode: manual_immediate
 
+management:
+  server:
+    port: ${MANAGEMENT_PORT:8085}
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus,metrics
+  tracing:
+    sampling:
+      probability: ${TRACING_SAMPLING_PROBABILITY:1.0}
+  zipkin:
+    tracing:
+      endpoint: ${ZIPKIN_ENDPOINT:http://localhost:9411/api/v2/spans}
+
 logstash:
   host: ${LOGSTASH_HOST:localhost}
   port: ${LOGSTASH_PORT:5000}

@@ -39,6 +39,11 @@
         <appender-ref ref="ASYNC_LOGSTASH"/>
     </logger>
 
+    <logger name="ru.yandex.practicum.mybankfront" level="DEBUG" additivity="false">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="ASYNC_LOGSTASH"/>
+    </logger>
+
     <logger name="org.springframework.security" level="WARN"/>
     <logger name="org.springframework.web"      level="INFO"/>
     <logger name="org.hibernate"                level="WARN"/>
