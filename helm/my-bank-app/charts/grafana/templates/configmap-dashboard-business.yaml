@@ -20,14 +20,14 @@ data:
       "panels": [
         {
           "id": 1,
-          "title": "Failed Withdrawals by Login",
+          "title": "Failed Withdrawals — Trend",
           "type": "timeseries",
           "datasource": { "type": "prometheus", "uid": "prometheus" },
           "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
           "targets": [
             {
-              "expr": "sum(increase(bank_cash_withdrawal_failed_total[10m])) by (login)",
-              "legendFormat": "login: {{ "{{" }}login{{ "}}" }}"
+              "expr": "sum(increase(bank_cash_withdrawal_failed_total[10m]))",
+              "legendFormat": "Total"
             }
           ],
           "fieldConfig": {
@@ -88,14 +88,14 @@ data:
         },
         {
           "id": 4,
-          "title": "Failed Transfers by Sender",
+          "title": "Failed Transfers by Step",
           "type": "timeseries",
           "datasource": { "type": "prometheus", "uid": "prometheus" },
           "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 },
           "targets": [
             {
-              "expr": "sum(increase(bank_transfer_failed_total[10m])) by (sender)",
-              "legendFormat": "sender: {{ "{{" }}sender{{ "}}" }}"
+              "expr": "sum(increase(bank_transfer_failed_total[10m])) by (step)",
+              "legendFormat": "step: {{ "{{" }}step{{ "}}" }}"
             }
           ],
           "fieldConfig": {
@@ -104,14 +104,14 @@ data:
         },
         {
           "id": 5,
-          "title": "Failed Transfers by Recipient",
+          "title": "Failed Transfers — Trend",
           "type": "timeseries",
           "datasource": { "type": "prometheus", "uid": "prometheus" },
           "gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 },
           "targets": [
             {
-              "expr": "sum(increase(bank_transfer_failed_total[10m])) by (recipient)",
-              "legendFormat": "recipient: {{ "{{" }}recipient{{ "}}" }}"
+              "expr": "sum(increase(bank_transfer_failed_total[10m]))",
+              "legendFormat": "Total"
             }
           ],
           "fieldConfig": {
@@ -120,14 +120,14 @@ data:
         },
         {
           "id": 6,
-          "title": "Notification Send Failures by Login",
+          "title": "Notification Send Failures by Type",
           "type": "timeseries",
           "datasource": { "type": "prometheus", "uid": "prometheus" },
           "gridPos": { "h": 8, "w": 12, "x": 0, "y": 16 },
           "targets": [
             {
-              "expr": "sum(increase(bank_notification_send_failed_total[10m])) by (login)",
-              "legendFormat": "login: {{ "{{" }}login{{ "}}" }}"
+              "expr": "sum(increase(bank_notification_send_failed_total[10m])) by (type)",
+              "legendFormat": "type: {{ "{{" }}type{{ "}}" }}"
             }
           ],
           "fieldConfig": {
