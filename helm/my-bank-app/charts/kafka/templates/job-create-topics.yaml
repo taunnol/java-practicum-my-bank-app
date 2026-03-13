@@ -28,12 +28,15 @@ spec:
               until /opt/kafka/bin/kafka-topics.sh --bootstrap-server kafka:{{ .Values.service.port }} --list > /dev/null 2>&1; do
                 sleep 5
               done
-              echo "Kafka is ready. Creating topic {{ .Values.topic.name }}..."
+              echo "Kafka is ready. Creating topics..."
+              {{- range .Values.topics }}
+              echo "Creating topic {{ .name }}..."
               /opt/kafka/bin/kafka-topics.sh --create --if-not-exists \
-                --bootstrap-server kafka:{{ .Values.service.port }} \
-                --topic {{ .Values.topic.name }} \
-                --partitions {{ .Values.topic.partitions }} \
-                --replication-factor {{ .Values.topic.replicationFactor }} \
-                --config retention.ms={{ .Values.topic.retentionMs }}
-              echo "Topic {{ .Values.topic.name }} is ready."
+                --bootstrap-server kafka:{{ $.Values.service.port }} \
+                --topic {{ .name }} \
+                --partitions {{ .partitions }} \
+                --replication-factor {{ .replicationFactor }} \
+                --config retention.ms={{ .retentionMs }}
+              echo "Topic {{ .name }} is ready."
+              {{- end }}
       restartPolicy: OnFailure

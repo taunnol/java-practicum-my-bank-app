@@ -9,9 +9,12 @@ metadata:
 data:
   logstash.conf: |
     input {
-      tcp {
-        port => {{ .Values.logstash.service.tcpPort }}
-        codec => json_lines
+      kafka {
+        bootstrap_servers => "{{ .Values.global.kafka.bootstrapServers }}"
+        topics => ["{{ .Values.logstash.kafka.topic }}"]
+        codec => json
+        group_id => "{{ .Values.logstash.kafka.groupId }}"
+        auto_offset_reset => "earliest"
       }
     }
 

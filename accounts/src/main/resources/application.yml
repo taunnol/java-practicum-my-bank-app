@@ -27,11 +27,8 @@ management:
     tracing:
       endpoint: ${ZIPKIN_ENDPOINT:http://localhost:9411/api/v2/spans}
 
-logstash:
-  host: ${LOGSTASH_HOST:localhost}
-  port: ${LOGSTASH_PORT:5000}
-
 bank:
   kafka:
     topic:
       notifications: bank.notifications
+      logs: bank.logs

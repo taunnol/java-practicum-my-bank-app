@@ -35,8 +35,6 @@ spec:
           image: "{{ .Values.logstash.image.repository }}:{{ .Values.logstash.image.tag }}"
           imagePullPolicy: {{ .Values.logstash.image.pullPolicy }}
           ports:
-            - containerPort: {{ .Values.logstash.service.tcpPort }}
-              name: tcp-input
             - containerPort: 9600
               name: api
           env:

@@ -10,6 +10,7 @@ data:
   SERVER_PORT: {{ .Values.service.port | quote }}
   BANK_SECURITY_ENABLED: {{ .Values.security.enabled | quote }}
   BANK_GATEWAY_BASE_URL: "http://{{ .Values.global.services.gateway.host }}:{{ .Values.global.services.gateway.port }}"
+  KAFKA_BOOTSTRAP_SERVERS: {{ .Values.global.kafka.bootstrapServers }}
   SPRING_CONFIG_ADDITIONAL_LOCATION: /app/config/
   application.yml: |
     spring:
@@ -33,9 +34,10 @@ data:
                 user-info-uri: http://{{ .Values.global.keycloak.host }}:{{ .Values.global.keycloak.httpPort }}/realms/{{ .Values.global.keycloak.realmName }}/protocol/openid-connect/userinfo
                 jwk-set-uri: {{ .Values.global.keycloak.jwkSetUri }}
                 user-name-attribute: preferred_username
-    logstash:
-      host: logstash
-      port: 5000
+    bank:
+      kafka:
+        topic:
+          logs: bank.logs
     management:
       endpoints:
         web:

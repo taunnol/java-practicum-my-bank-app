@@ -9,6 +9,7 @@ metadata:
 data:
   SERVER_PORT: {{ .Values.service.port | quote }}
   BANK_SECURITY_ENABLED: {{ .Values.security.enabled | quote }}
+  KAFKA_BOOTSTRAP_SERVERS: {{ .Values.global.kafka.bootstrapServers }}
   SPRING_CONFIG_ADDITIONAL_LOCATION: /app/config/
   application.yml: |
     spring:
@@ -37,9 +38,10 @@ data:
               uri: "http://{{ .Values.global.services.transfer.host }}:{{ .Values.global.services.transfer.port }}"
               predicates:
                 - "Path=/api/transfers/**"
-    logstash:
-      host: logstash
-      port: 5000
+    bank:
+      kafka:
+        topic:
+          logs: bank.logs
     management:
       endpoints:
         web:

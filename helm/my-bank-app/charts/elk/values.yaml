@@ -18,8 +18,9 @@ logstash:
     repository: docker.elastic.co/logstash/logstash
     tag: "8.15.0"
     pullPolicy: IfNotPresent
-  service:
-    tcpPort: 5000
+  kafka:
+    topic: bank.logs
+    groupId: logstash
   resources:
     requests:
       cpu: 100m
