@@ -9,11 +9,15 @@ service:
   port: 9092
   controllerPort: 9093
 
-topic:
-  name: bank.notifications
-  partitions: 3
-  replicationFactor: 1
-  retentionMs: "-1"
+topics:
+  - name: bank.notifications
+    partitions: 3
+    replicationFactor: 1
+    retentionMs: "-1"
+  - name: bank.logs
+    partitions: 3
+    replicationFactor: 1
+    retentionMs: "604800000"
 
 persistence:
   enabled: true

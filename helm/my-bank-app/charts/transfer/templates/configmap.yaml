@@ -13,6 +13,8 @@ data:
   SPRING_CONFIG_ADDITIONAL_LOCATION: /app/config/
   application.yml: |
     spring:
+      application:
+        name: transfer
       security:
         oauth2:
           resourceserver:
@@ -39,6 +41,20 @@ data:
           properties:
             enable.idempotence: true
             spring.json.add.type.headers: false
+    management:
+      endpoints:
+        web:
+          exposure:
+            include: health,info,prometheus,metrics
+      metrics:
+        tags:
+          application: transfer
+      tracing:
+        sampling:
+          probability: 1.0
+      zipkin:
+        tracing:
+          endpoint: http://{{ .Values.global.zipkin.host }}:{{ .Values.global.zipkin.port }}/api/v2/spans
     resilience4j:
       timelimiter:
         configs:
@@ -48,3 +64,4 @@ data:
       kafka:
         topic:
           notifications: bank.notifications
+          logs: bank.logs

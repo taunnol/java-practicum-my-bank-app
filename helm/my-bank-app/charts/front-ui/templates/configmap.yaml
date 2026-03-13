@@ -10,9 +10,12 @@ data:
   SERVER_PORT: {{ .Values.service.port | quote }}
   BANK_SECURITY_ENABLED: {{ .Values.security.enabled | quote }}
   BANK_GATEWAY_BASE_URL: "http://{{ .Values.global.services.gateway.host }}:{{ .Values.global.services.gateway.port }}"
+  KAFKA_BOOTSTRAP_SERVERS: {{ .Values.global.kafka.bootstrapServers }}
   SPRING_CONFIG_ADDITIONAL_LOCATION: /app/config/
   application.yml: |
     spring:
+      application:
+        name: front-ui
       security:
         oauth2:
           client:
@@ -31,3 +34,21 @@ data:
                 user-info-uri: http://{{ .Values.global.keycloak.host }}:{{ .Values.global.keycloak.httpPort }}/realms/{{ .Values.global.keycloak.realmName }}/protocol/openid-connect/userinfo
                 jwk-set-uri: {{ .Values.global.keycloak.jwkSetUri }}
                 user-name-attribute: preferred_username
+    bank:
+      kafka:
+        topic:
+          logs: bank.logs
+    management:
+      endpoints:
+        web:
+          exposure:
+            include: health,info,prometheus,metrics
+      metrics:
+        tags:
+          application: front-ui
+      tracing:
+        sampling:
+          probability: 1.0
+      zipkin:
+        tracing:
+          endpoint: http://{{ .Values.global.zipkin.host }}:{{ .Values.global.zipkin.port }}/api/v2/spans

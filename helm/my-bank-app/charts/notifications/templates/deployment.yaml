@@ -34,6 +34,9 @@ spec:
         - name: notifications
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - containerPort: 8085
+              name: management
           envFrom:
             - configMapRef:
                 name: {{ .Release.Name }}-notifications-config
@@ -41,20 +44,16 @@ spec:
             - name: app-config
               mountPath: /app/config
           readinessProbe:
-            exec:
-              command:
-                - /bin/sh
-                - -c
-                - pgrep -f app.jar
+            httpGet:
+              path: /actuator/health
+              port: 8085
             initialDelaySeconds: 30
             periodSeconds: 10
             timeoutSeconds: 5
           livenessProbe:
-            exec:
-              command:
-                - /bin/sh
-                - -c
-                - pgrep -f app.jar
+            httpGet:
+              path: /actuator/health
+              port: 8085
             initialDelaySeconds: 60
             periodSeconds: 15
             timeoutSeconds: 5

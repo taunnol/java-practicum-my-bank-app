@@ -9,9 +9,12 @@ metadata:
 data:
   SERVER_PORT: {{ .Values.service.port | quote }}
   BANK_SECURITY_ENABLED: {{ .Values.security.enabled | quote }}
+  KAFKA_BOOTSTRAP_SERVERS: {{ .Values.global.kafka.bootstrapServers }}
   SPRING_CONFIG_ADDITIONAL_LOCATION: /app/config/
   application.yml: |
     spring:
+      application:
+        name: gateway
       security:
         oauth2:
           resourceserver:
@@ -35,3 +38,21 @@ data:
               uri: "http://{{ .Values.global.services.transfer.host }}:{{ .Values.global.services.transfer.port }}"
               predicates:
                 - "Path=/api/transfers/**"
+    bank:
+      kafka:
+        topic:
+          logs: bank.logs
+    management:
+      endpoints:
+        web:
+          exposure:
+            include: health,info,prometheus,metrics
+      metrics:
+        tags:
+          application: gateway
+      tracing:
+        sampling:
+          probability: 1.0
+      zipkin:
+        tracing:
+          endpoint: http://{{ .Values.global.zipkin.host }}:{{ .Values.global.zipkin.port }}/api/v2/spans

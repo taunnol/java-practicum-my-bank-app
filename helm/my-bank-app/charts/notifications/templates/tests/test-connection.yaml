@@ -16,8 +16,5 @@ spec:
         - /bin/sh
         - -c
         - |
-          echo "Checking notifications pod is running..."
-          nslookup {{ .Release.Name }}-notifications.{{ .Release.Namespace }}.svc.cluster.local || true
-          echo "Notifications service is a Kafka consumer (no HTTP endpoint)."
-          echo "Test passed."
+          wget -qO- --timeout=10 http://notifications:8085/actuator/health | grep -q '"status"'
   restartPolicy: Never

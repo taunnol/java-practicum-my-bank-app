@@ -1,5 +1,7 @@
 package ru.yandex.practicum.bank.transfer.service;
 
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -33,6 +35,8 @@ class TransferServiceTest {
     @Mock
     private CircuitBreaker circuitBreaker;
 
+    private MeterRegistry meterRegistry;
+
     private TransferService service;
 
     @BeforeEach
@@ -43,7 +47,8 @@ class TransferServiceTest {
         lenient().when(circuitBreaker.run(any(Supplier.class), any(Function.class))).thenAnswer(inv ->
                 ((Supplier<?>) inv.getArgument(0)).get());
 
-        service = new TransferService(accountsClient, notificationsClient, circuitBreakerFactory);
+        meterRegistry = new SimpleMeterRegistry();
+        service = new TransferService(accountsClient, notificationsClient, circuitBreakerFactory, meterRegistry);
     }
 
     @Test

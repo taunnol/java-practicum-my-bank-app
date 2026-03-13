@@ -6,6 +6,10 @@ global:
     host: postgres
     port: 5432
 
+  zipkin:
+    host: zipkin
+    port: 9411
+
   keycloak:
     host: keycloak
     httpPort: 8080
@@ -63,4 +67,16 @@ gateway:
   enabled: true
 
 front-ui:
+  enabled: true
+
+zipkin:
+  enabled: true
+
+prometheus:
+  enabled: true
+
+grafana:
+  enabled: true
+
+elk:
   enabled: true
