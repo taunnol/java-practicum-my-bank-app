@@ -34,7 +34,7 @@ public class NotificationListener {
             String login = event.actorLogin() != null ? event.actorLogin() : "unknown";
             log.error("Failed to process notification: type={}, actor={}, error={}",
                     event.type(), login, e.getMessage(), e);
-            meterRegistry.counter("bank.notification.send.failed", "login", login).increment();
+            meterRegistry.counter("bank.notification.send.failed", "type", event.type()).increment();
         }
     }
 }

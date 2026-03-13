@@ -51,8 +51,7 @@ public class TransferService {
         } catch (RuntimeException e) {
             log.warn("Transfer failed — withdrawal error: from={}, to={}, amount={}, reason={}",
                     fromLogin, toLogin, amount, e.getMessage());
-            meterRegistry.counter("bank.transfer.failed",
-                    "sender", fromLogin, "recipient", toLogin).increment();
+            meterRegistry.counter("bank.transfer.failed", "step", "withdraw").increment();
             throw e;
         }
 
@@ -65,8 +64,7 @@ public class TransferService {
         } catch (RuntimeException e) {
             log.error("Transfer failed — deposit error, reverting: from={}, to={}, amount={}, reason={}",
                     fromLogin, toLogin, amount, e.getMessage());
-            meterRegistry.counter("bank.transfer.failed",
-                    "sender", fromLogin, "recipient", toLogin).increment();
+            meterRegistry.counter("bank.transfer.failed", "step", "deposit").increment();
             try {
                 accountsClient.deposit(fromLogin, amount);
                 log.info("Compensating deposit successful: login={}, amount={}", fromLogin, amount);

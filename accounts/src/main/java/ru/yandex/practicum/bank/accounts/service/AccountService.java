@@ -99,7 +99,7 @@ public class AccountService {
         int updated = repo.withdrawIfEnough(login, amount);
         if (updated != 1) {
             log.warn("Withdrawal failed — insufficient funds: login={}, amount={}", login, amount);
-            meterRegistry.counter("bank.cash.withdrawal.failed", "login", login).increment();
+            meterRegistry.counter("bank.cash.withdrawal.failed").increment();
             throw new NotEnoughFundsException("Недостаточно средств на счету");
         }
         log.info("Withdrawal successful: login={}, amount={}", login, amount);
